@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Authorisation.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [Produces("application/json")]
     public class AuthorisationController : ControllerBase
     {
@@ -25,5 +25,7 @@ namespace Authorisation.Controllers
         {
             return new Dictionary<string,int> {{"RequestsUnderConsideration", 0 }};
         }
+        
+        
     }
 }

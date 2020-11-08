@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="TestModels\AccountRequestTests.cs" />
+      <Compile Remove="TestModels\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="TestModels\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="TestModels\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="TestModels\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\appsettings.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\global.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\Properties\launchSettings.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels.deps.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels.runtimeconfig.dev.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels.runtimeconfig.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\appsettings.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\global.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\Properties\launchSettings.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels.deps.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels.runtimeconfig.dev.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels.runtimeconfig.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\appsettings.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\global.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\Properties\launchSettings.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels.deps.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels.runtimeconfig.dev.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels.runtimeconfig.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\obj\TestModels.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\bin\Debug\netcoreapp3.1\TestModels\obj\TestModels.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="TestModels\bin\Debug\netcoreapp3.1\TestModels\obj\TestModels.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="TestModels\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="TestModels\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="TestModels\obj\TestModels.csproj.nuget.dgspec.json" />
+    </ItemGroup>
+
+
+</Project>
