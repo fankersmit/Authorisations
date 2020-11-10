@@ -2,7 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorisations", "Authorisations.csproj", "{4744F5CD-DC2A-4D2B-B318-507576C1AB7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestModels", "TestModels\TestModels.csproj", "{B05909DE-6491-423F-B9E2-8F00C9C94F5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Models", "Tests.Models\Tests.Models.csproj", "{B05909DE-6491-423F-B9E2-8F00C9C94F5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Controllers", "Tests.Controllers\Tests.Controllers.csproj", "{2C98F092-5EC8-45D2-B459-86740E85A0B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +20,9 @@ Global
 		{B05909DE-6491-423F-B9E2-8F00C9C94F5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B05909DE-6491-423F-B9E2-8F00C9C94F5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B05909DE-6491-423F-B9E2-8F00C9C94F5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C98F092-5EC8-45D2-B459-86740E85A0B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C98F092-5EC8-45D2-B459-86740E85A0B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C98F092-5EC8-45D2-B459-86740E85A0B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C98F092-5EC8-45D2-B459-86740E85A0B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

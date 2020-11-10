@@ -1,12 +1,13 @@
 using System;
 using System.Net.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Authorisation.Controllers
 {
     public interface IRequest
     {
         // New, POST            Nieuw
-        HttpResponseMessage New( HttpRequestMessage request);
+        HttpResponseMessage Submit(string postData, HttpRequestMessage request);
         // Confirm, PUT        Bevestigen
         HttpResponseMessage Confirm( HttpRequestMessage request, Guid RequestId);
         // Cancel, PUT         Annuleren

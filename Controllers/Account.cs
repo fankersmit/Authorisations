@@ -1,23 +1,30 @@
 using System;
+using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Authorisation.Models;
 
 namespace Authorisation.Controllers
 {
-    public class Account : Controller, IRequest
+    [ApiController]
+    [Route("api/[controller]")]
+    [Produces("application/json")]
+    public class Account : ControllerBase, IRequest
     {
         // POST
-        public HttpResponseMessage New(HttpRequestMessage request)
+        [HttpPost]
+       public HttpResponseMessage Submit(string postData, HttpRequestMessage request)
         {
             // create request
-            
+            //var body = Request.Body.;
+            var accountRequest = JsonSerializer.Deserialize<AccountRequest>(postData);
             // put it on queue
+            // <TODO>
             // reply success
-            throw new NotImplementedException();
+            return new HttpResponseMessage(HttpStatusCode.Accepted);  
         }
 
-        // PUT
         public HttpResponseMessage Confirm(HttpRequestMessage request, Guid RequestId)
         {
             throw new NotImplementedException();

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -6,27 +7,34 @@ namespace Authorisation.Models
 {
     public class AccountRequest: IRequest
     {
+         // properties
          public Guid  RequestID { get; private set; } 
          public string FirstName{ get; private set; } 
          public string LastName { get; private set; } 
          public Contract Contract{ get; private set; } 
-         public DateTime StartDate{ get; private set; }
+         public DateTime DateSubmitted{ get; private set; }
          public RequestStatus Status { get; private set; }
 
+         // contructors
          private AccountRequest()
          {
              RequestID = Guid.NewGuid();
              Status = RequestStatus.New;
          }
 
-         public AccountRequest(string fn, string ln, Contract contract, DateTime start) : this()
+         public AccountRequest(string fn, string ln, Contract contract) : this()
          {
              FirstName = fn;
              LastName = ln;
              Contract = contract;
-             StartDate = start;
          }
 
+         // methods, actions
+         public void Submit()
+         {
+             DateSubmitted = DateTime.Today;
+             Status = RequestStatus.Submitted;
+         }
          public void Confirm()
          {
              throw new NotImplementedException();
@@ -63,6 +71,14 @@ namespace Authorisation.Models
              options.WriteIndented = true;
              options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
              return JsonSerializer.Serialize<AccountRequest>(this, options);
+         }
+
+         public void SaveTo(string directoryPath)
+         {
+             var  fullPath = Path.Combine(directoryPath,$"{RequestID}.json");
+             // note the using declaration
+             using StreamWriter outputFile = new StreamWriter(fullPath);
+             outputFile.WriteLine(ToJson());
          }
     }
 }

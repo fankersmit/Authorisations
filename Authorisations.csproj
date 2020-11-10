@@ -10,18 +10,26 @@
     <ItemGroup>
       <Compile Remove="TestModels\AccountRequestTests.cs" />
       <Compile Remove="TestModels\**" />
+      <Compile Remove="Tests.Controllers\**" />
+      <Compile Remove="Tests.Models\**" />
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Remove="TestModels\**" />
+      <EmbeddedResource Remove="Tests.Controllers\**" />
+      <EmbeddedResource Remove="Tests.Models\**" />
     </ItemGroup>
 
     <ItemGroup>
       <None Remove="TestModels\**" />
+      <None Remove="Tests.Controllers\**" />
+      <None Remove="Tests.Models\**" />
     </ItemGroup>
 
     <ItemGroup>
       <Content Remove="TestModels\**" />
+      <Content Remove="Tests.Controllers\**" />
+      <Content Remove="Tests.Models\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -58,6 +66,17 @@
       <_ContentIncludedByDefault Remove="TestModels\obj\project.assets.json" />
       <_ContentIncludedByDefault Remove="TestModels\obj\project.packagespec.json" />
       <_ContentIncludedByDefault Remove="TestModels\obj\TestModels.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="Tests.Controllers\bin\Debug\netcoreapp3.1\Authorisations.deps.json" />
+      <_ContentIncludedByDefault Remove="Tests.Controllers\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="Tests.Controllers\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="Tests.Controllers\obj\Tests.Controllers.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="Tests.Models\bin\Debug\netcoreapp3.1\TestModels.deps.json" />
+      <_ContentIncludedByDefault Remove="Tests.Models\bin\Debug\netcoreapp3.1\TestModels.runtimeconfig.dev.json" />
+      <_ContentIncludedByDefault Remove="Tests.Models\bin\Debug\netcoreapp3.1\TestModels.runtimeconfig.json" />
+      <_ContentIncludedByDefault Remove="Tests.Models\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="Tests.Models\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="Tests.Models\obj\TestModels.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="Tests.Models\obj\Tests.Models.csproj.nuget.dgspec.json" />
     </ItemGroup>
 
 

@@ -26,6 +26,16 @@ namespace Authorisation.Controllers
             return new Dictionary<string,int> {{"RequestsUnderConsideration", 0 }};
         }
         
+        [HttpGet]
+        public object Get()
+        {
+            var responseObject = new
+            {
+                Status = "Up"
+            };
+            _logger.LogInformation($"Status pinged: {responseObject.Status}");
+            return responseObject;
+        }
         
     }
 }

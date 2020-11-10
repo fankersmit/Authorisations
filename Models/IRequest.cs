@@ -2,6 +2,8 @@ namespace Authorisation.Models
 {
     public interface IRequest
     {
+        // Submit()
+        void Submit();
         // Confirm
         void Confirm();
         // Cancel
