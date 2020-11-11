@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -12,24 +13,28 @@
       <Compile Remove="TestModels\**" />
       <Compile Remove="Tests.Controllers\**" />
       <Compile Remove="Tests.Models\**" />
+      <Compile Remove="RequestsApp\**" />
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Remove="TestModels\**" />
       <EmbeddedResource Remove="Tests.Controllers\**" />
       <EmbeddedResource Remove="Tests.Models\**" />
+      <EmbeddedResource Remove="RequestsApp\**" />
     </ItemGroup>
 
     <ItemGroup>
       <None Remove="TestModels\**" />
       <None Remove="Tests.Controllers\**" />
       <None Remove="Tests.Models\**" />
+      <None Remove="RequestsApp\**" />
     </ItemGroup>
 
     <ItemGroup>
       <Content Remove="TestModels\**" />
       <Content Remove="Tests.Controllers\**" />
       <Content Remove="Tests.Models\**" />
+      <Content Remove="RequestsApp\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -77,6 +82,9 @@
       <_ContentIncludedByDefault Remove="Tests.Models\obj\project.packagespec.json" />
       <_ContentIncludedByDefault Remove="Tests.Models\obj\TestModels.csproj.nuget.dgspec.json" />
       <_ContentIncludedByDefault Remove="Tests.Models\obj\Tests.Models.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="RequestsApp\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="RequestsApp\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="RequestsApp\obj\RequestsApp.csproj.nuget.dgspec.json" />
     </ItemGroup>
 
 

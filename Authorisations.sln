@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Models", "Tests.Model
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Controllers", "Tests.Controllers\Tests.Controllers.csproj", "{2C98F092-5EC8-45D2-B459-86740E85A0B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestsApp", "RequestsApp\RequestsApp.csproj", "{9C8ABB7D-C145-4E44-8671-4644B6F9851B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{2C98F092-5EC8-45D2-B459-86740E85A0B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C98F092-5EC8-45D2-B459-86740E85A0B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C98F092-5EC8-45D2-B459-86740E85A0B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C8ABB7D-C145-4E44-8671-4644B6F9851B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C8ABB7D-C145-4E44-8671-4644B6F9851B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C8ABB7D-C145-4E44-8671-4644B6F9851B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C8ABB7D-C145-4E44-8671-4644B6F9851B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

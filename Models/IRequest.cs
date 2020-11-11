@@ -1,4 +1,4 @@
-namespace Authorisation.Models
+namespace AuthorisationRequest.Models
 {
     public interface IRequest
     {

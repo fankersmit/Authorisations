@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Authorisation.Controllers
+namespace AuthorisationRequest.Controllers
 {
     public interface IRequest
     {

@@ -3,9 +3,9 @@ using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using Authorisation.Models;
+using AuthorisationRequest.Models;
 
-namespace Authorisation.Controllers
+namespace AuthorisationRequest.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
