@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using  AuthorisationRequest.Infrastructure;
+
 
 namespace AuthorisationRequest
 {
@@ -26,6 +28,7 @@ namespace AuthorisationRequest
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.WriteIndented = true;
                 });
+            services.AddSingleton<RabbitMqRpcClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,11 +38,41 @@ namespace AuthorisationRequest
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseRabbitRpcClient();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        }
+    }
+    
+    public static class ApplicationBuilderExtentions
+    {
+        //store a single long-living object
+        private static RabbitMqRpcClient _rpcClient { get; set; }
+
+        public static IApplicationBuilder UseRabbitRpcClient(this IApplicationBuilder app)
+        {
+            _rpcClient = app.ApplicationServices.GetService<RabbitMqRpcClient>();
+
+            var lifetime = app.ApplicationServices.GetService<IHostApplicationLifetime>();
+
+            lifetime.ApplicationStarted.Register(OnStarted);
+
+            //press Ctrl+C to reproduce if your app runs in Kestrel as a console app
+            lifetime.ApplicationStopping.Register(OnStopping);
+
+            return app;
+        }
+
+        private static void OnStarted()
+        {
+            _rpcClient.Register();
+        }
+
+        private static void OnStopping()
+        {
+            _rpcClient.Deregister();    
         }
     }
 }
