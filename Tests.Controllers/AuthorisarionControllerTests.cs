@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -19,14 +20,17 @@ namespace Tests.Controllers
             _factory = factory;
         }
         
-        [Fact]
-        public async Task GetRequestUnderConsideration_ReturnsSuccessAndCount()
+        [Theory]
+        [InlineData("requests", HttpStatusCode.OK, 0 )]
+        [InlineData("requests/account", HttpStatusCode.OK, 0 )]
+        [InlineData("requests/product", HttpStatusCode.OK, 0 )]
+        [InlineData("requests/organisation", HttpStatusCode.OK, 0 )]
+        public async Task GetRequestUnderConsideration_ReturnsSuccessAndCount(string route, HttpStatusCode statusCode, int count )
         {
             // arrange
-            var expected = 0;
             var client = _factory.CreateClient();
             // act
-            var response = await client.GetAsync($"{_root}/requests/under-consideration");
+            var response = await client.GetAsync($"{_root}/{route}/under-consideration");
             // assert
             try
             {
@@ -37,27 +41,23 @@ namespace Tests.Controllers
                 Assert.False( 0==0, e.Message );
             }
             Assert.NotNull(response.Content);
+            Assert.Equal(statusCode, response.StatusCode);
             var ruc = await DeserializeJson<RequestsUnderConsideration>(response.Content);
-            Assert.Equal(expected, ruc.Count);
+            Assert.Equal(count, ruc.Count);
+            
         }
 
         [Fact]
-        public async Task GetRoot_ReturnsSuccesAndStatusUp()
+        public async Task GetRoot_ReturnsSuccessAndStatusUp()
         {
             // arrange
             var client = _factory.CreateClient();
             var expected = "Up";
             // act
             var response = await client.GetAsync($"{_root}");
+            
             // assert
-            try
-            {
-                response.EnsureSuccessStatusCode();
-            }
-            catch( HttpRequestException e )
-            {
-                Assert.False( 0==0, e.Message );
-            }
+            Assert.True(response.IsSuccessStatusCode);
             Assert.NotNull(response.Content);
             var runningStatus = await DeserializeJson<RunningStatus>(response.Content);
             Assert.Equal(expected, runningStatus.Status);
@@ -80,6 +80,7 @@ namespace Tests.Controllers
         
         private class RequestsUnderConsideration
         {
+            public string RequstType { get; set; }  
             public int Count { get; set; }
         }
         

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorisations", "Authorisations.csproj", "{4744F5CD-DC2A-4D2B-B318-507576C1AB7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorisations", "Authorisations\Authorisations.csproj", "{4744F5CD-DC2A-4D2B-B318-507576C1AB7D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Models", "Tests.Models\Tests.Models.csproj", "{B05909DE-6491-423F-B9E2-8F00C9C94F5B}"
 EndProject

@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Authorisations.csproj" />
+      <ProjectReference Include="..\Authorisations\Authorisations.csproj" />
     </ItemGroup>
 
 </Project>
