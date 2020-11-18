@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace AuthorisationRequest.Models
+namespace Authorisations.Models
 {
     public class Contract
     {

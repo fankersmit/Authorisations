@@ -5,21 +5,35 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
-using AuthorisationRequest;
+using Authorisations;
 
 namespace Tests.Controllers
 {
     [Collection("Integration Tests")]
-    public class AuthorisationControllerTests
+    public class AuthorisationsControllerTests
     {
         private readonly WebApplicationFactory<Startup> _factory;
         private readonly string _root = "api/authorisationrequest";
 
-        public AuthorisationControllerTests(WebApplicationFactory<Startup> factory)
+        public AuthorisationsControllerTests(WebApplicationFactory<Startup> factory)
         {
             _factory = factory;
         }
-        
+
+        [Theory]
+        [InlineData("requests", HttpStatusCode.OK )]
+        [InlineData("requests/properties", HttpStatusCode.BadRequest )]
+        [InlineData("requests/2345-3456", HttpStatusCode.BadRequest )]
+        public async Task GetWithWrongRequestType_ReturnsBadRequest(string route, HttpStatusCode expected)
+        {
+            // arrange
+            var client = _factory.CreateClient();
+            // act
+            var response = await client.GetAsync($"{_root}/{route}/under-consideration");
+            // assert
+            Assert.Equal(expected, response.StatusCode);
+        }
+
         [Theory]
         [InlineData("requests", HttpStatusCode.OK, 0 )]
         [InlineData("requests/account", HttpStatusCode.OK, 0 )]
@@ -44,7 +58,6 @@ namespace Tests.Controllers
             Assert.Equal(statusCode, response.StatusCode);
             var ruc = await DeserializeJson<RequestsUnderConsideration>(response.Content);
             Assert.Equal(count, ruc.Count);
-            
         }
 
         [Fact]

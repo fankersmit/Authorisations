@@ -4,9 +4,9 @@ using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace AuthorisationRequest.Infrastructure
+namespace Authorisations.Infrastructure
 {
-    public class RabbitMqRpcClient
+    public class RabbitMqRpcClient : IRabbitMqRpcClient
     {
         private readonly IConnection connection;
         private readonly IModel channel;

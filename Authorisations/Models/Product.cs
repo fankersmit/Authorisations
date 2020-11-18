@@ -1,6 +1,6 @@
 using System;
 
-namespace AuthorisationRequest.Models
+namespace Authorisations.Models
 {
     public class Product
     {

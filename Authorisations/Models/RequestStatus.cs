@@ -1,4 +1,4 @@
-namespace AuthorisationRequest.Models
+namespace Authorisations.Models
 {
     public enum RequestStatus
     {

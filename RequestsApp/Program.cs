@@ -2,6 +2,12 @@
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using RequestsApp.Domain;
+using RequestsApp.Infrastructure;
+    
 
 namespace RequestsApp
 {
@@ -9,52 +15,25 @@ namespace RequestsApp
     {
         public static void Main(string[] args)
         {
-            // phony return value creation
-            Random rnd = new Random( DateTime.Now.Minute); 
-            
-            var factory = new ConnectionFactory() {HostName = "localhost"};
-            using var connection = factory.CreateConnection();
-            using (var channel = connection.CreateModel())
+            // setup
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+
+            using (ServiceProvider serviceProvider = services.BuildServiceProvider())
             {
-                channel.QueueDeclare(queue: "rpc_queue", durable: false,
-                    exclusive: false, autoDelete: false, arguments: null);
-                channel.BasicQos(0, 1, false);
-                var consumer = new EventingBasicConsumer(channel);
-                channel.BasicConsume(queue: "rpc_queue", autoAck: false, consumer: consumer);
-                Console.WriteLine(" [x] Awaiting RPC requests");
-
-                consumer.Received += (model, ea) =>
-                {
-                    string response = null;
-                    var body = ea.Body.ToArray();
-                    var props = ea.BasicProperties;
-                    var replyProps = channel.CreateBasicProperties();
-                    replyProps.CorrelationId = props.CorrelationId;
-
-                    try
-                    {
-                        var message = Encoding.UTF8.GetString(body);
-                        Console.WriteLine(message);
-                        response = $"{message}: {rnd.Next(0,40000)}";
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(" [.] " + e.Message);
-                        response = "";
-                    }
-                    finally
-                    {
-                        var responseBytes = Encoding.UTF8.GetBytes(response);
-                        channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
-                            basicProperties: replyProps, body: responseBytes);
-                        channel.BasicAck(deliveryTag: ea.DeliveryTag,
-                            multiple: false);
-                    }
-                };
+                AuthorisationRequestsHandler requestHandler = new AuthorisationRequestsHandler();
+                RabbitMQServer app = serviceProvider.GetService<RabbitMQServer>();
+                app.Run(requestHandler);
 
                 Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
             }
+        }
+    
+        private static void ConfigureServices(ServiceCollection services)
+        {
+            services.AddLogging(configure =>configure.AddConsole())
+                .AddTransient<RabbitMQServer>();
         }
     }
 }

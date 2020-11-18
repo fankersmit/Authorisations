@@ -19,16 +19,16 @@ term| definition or values
 
 </br>  
 
-***    
+*** 
 ## API definiition
 
 |done|style|CQ|path | verb | success | Error | description|
 |:---:|:---:|:---:|:---|:---:|:---:|:---:|---|
-|<span style="color:green">Yes</span>|REST|Q|root|GET| 201 | 404| returns { status: "up" }|
+|<span style="color:green">Yes</span>|REST|Q|root|GET| 200 | 404| returns { status: "up" }|
 |<span style="color:red">No</span>|REST|Q|root/request/{id}/status |GET| 200|404|  returns current status of request with {id}|
 |<span style="color:red">No</span>|RPC|Q|root/request/{id}/{status} |GET|200|404|  returns true if status of request with {id}| is {status}
 |<span style="color:green">Yes</span>|REST|Q|root/requests/under-consideration |GET| 200|404| return total number of requests being processed
-|<span style="color:red">No</span>|REST|Q|root/requests/{type}/under-consideration |GET| 200 |404 | return total number of account requests of {type }being processed
+|<span style="color:green">Yes</span>|REST|Q|root/requests/{type}/under-consideration |GET| 200 |404 | return total number of account requests of {type }being processed
 |<span style="color:red">No</span>|REST|Q|root/requests/{status} |GET| 200|404|  returns all requests with status = {status}
 |<span style="color:red">No</span>|REST|Q|root/requests/{type}/{status} |GET| 200|404|  returns all requests of {type} with status = {status}}
 |<span style="color:red">No</span>|REST|Q|root/request/{id}|GET| 200|404|  return  account request info

@@ -1,0 +1,4 @@
+root =  api/authorisations
+
+root        returns  { status: "up" }
+root/under-consideration     

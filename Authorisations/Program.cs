@@ -1,9 +1,9 @@
 using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using AuthorisationRequest.Infrastructure;
+using Authorisations.Infrastructure;
 
-namespace AuthorisationRequest
+namespace Authorisations
 {
     public class Program
     {

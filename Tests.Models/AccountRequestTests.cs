@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using AuthorisationRequest.Models;
+using Authorisations.Models;
 using Xunit;
 
 namespace Tests.Models
