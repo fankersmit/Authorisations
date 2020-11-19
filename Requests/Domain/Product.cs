@@ -1,8 +1,8 @@
 using System;
 
-namespace Authorisations.Models
+namespace Requests.Domain
 {
-    public class Product
+    public class Product : IProductModel
     {
         public string Name { get; set; }
         public string Description { get; set; }

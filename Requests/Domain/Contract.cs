@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Authorisations.Models
+namespace Requests.Domain
 {
-    public class Contract
+    public class Contract : IContractModel
     {
         public Guid ContractID  { get; private set; }
         public Organisation Organisation { get; private set; }

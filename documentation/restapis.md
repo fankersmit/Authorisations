@@ -39,3 +39,21 @@ term| definition or values
 |<span style="color:red">No</span>|REST|C|root/request/{id}/disapprove|POST| 202|404,405|  disapprove request where id = {id} 
 |<span style="color:red">No</span>|REST|C|root/request/{id}/conclude|POST| 202|404,405|  conclude request where id = {id} 
 |<span style="color:red">No</span>|REST|C|root/request/{id}/remove|DELETE|  204|404,405| remove request where id = {id} 
+
+<br>  
+
+
+***
+# Valid transitions
+
+ | |new|submit|Confirm|Cancel|Approve|Disapprove|Concludd|Remove|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|New|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>
+|Submitted|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>
+|Confirmed|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>
+|Cancelled|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>
+|Approved|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>
+|Disapproved|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>
+|Concluded|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>
+|Removed|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>
+

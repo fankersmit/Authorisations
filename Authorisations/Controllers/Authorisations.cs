@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
@@ -29,9 +30,9 @@ namespace Authorisations.Controllers
         [HttpGet]
         [Route("requests/under-consideration")]
         [Route("requests/{requestType}/under-consideration")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult RequestsUnderConsideration(string requestType)
+        [ProducesResponseType(typeof(Dictionary<string,string>),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Dictionary<string,string>),StatusCodes.Status404NotFound)]
+        public object RequestsUnderConsideration(string requestType)
         {
             // abort if request is fawlty
             if (!RequestChecker.IsKnownRequestType(requestType))
@@ -43,8 +44,10 @@ namespace Authorisations.Controllers
             var sep = requestType == null ? string.Empty : "-";  
             var underConsideration = $"{requestType}{sep}UnderConsideration";
             // put request on queue
-            var response = _rpcClient.Call(underConsideration);
-            return Ok( new Dictionary<string,string> {{ $"{underConsideration}", response }});
+            var result = _rpcClient.Call(underConsideration);
+            var split  = result.Split(':');
+            var response  = new Dictionary<string,string> {{ split[0], split[1]}};
+            return response;
         }
         
         [HttpGet]

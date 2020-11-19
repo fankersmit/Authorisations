@@ -21,9 +21,9 @@ namespace RequestsApp
 
             using (ServiceProvider serviceProvider = services.BuildServiceProvider())
             {
-                AuthorisationRequestsHandler requestHandler = new AuthorisationRequestsHandler();
-                RabbitMQServer app = serviceProvider.GetService<RabbitMQServer>();
-                app.Run(requestHandler);
+                var requestHandler = new AuthorisationRequestsHandler();
+                var app = serviceProvider.GetService<RabbitMQServer>();
+                app.Run();
 
                 Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
@@ -33,7 +33,8 @@ namespace RequestsApp
         private static void ConfigureServices(ServiceCollection services)
         {
             services.AddLogging(configure =>configure.AddConsole())
-                .AddTransient<RabbitMQServer>();
+                .AddTransient<RabbitMQServer>()
+                .AddTransient<AuthorisationRequestsHandler>();
         }
     }
 }

@@ -19,8 +19,8 @@ namespace Test.RequestApp
             var logger = loggerFactory.CreateLogger<RabbitMQServer>();
 
             // Act
-            var rabbitMQServer = new RabbitMQServer(logger);
-            rabbitMQServer.Run(requestHandler);
+            var rabbitMQServer = new RabbitMQServer(logger, requestHandler);
+            rabbitMQServer.Run();
             var handler = rabbitMQServer.RequestHandler; 
             // Assert
             Assert.NotNull(handler);

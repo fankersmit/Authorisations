@@ -18,7 +18,7 @@ namespace Authorisations.Controllers
         {
             // create request
             //var body = Request.Body.;
-            var accountRequest = JsonSerializer.Deserialize<AccountRequest>(postData);
+            //var accountRequest = JsonSerializer.Deserialize<AccountRequest>(postData);
             // put it on queue
             // <TODO>
             // reply success

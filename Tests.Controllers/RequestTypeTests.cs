@@ -4,7 +4,7 @@ using System.Text.Json;
 using Authorisations.Models;
 using Xunit;
 
-namespace Tests.Models
+namespace Tests.Controllers
 {
     public class RequestTypeTests
     {

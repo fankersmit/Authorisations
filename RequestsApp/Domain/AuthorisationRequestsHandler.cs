@@ -15,7 +15,7 @@ namespace RequestsApp.Domain
         
         public string ResponseFor(string message)
         {
-            return $"{message}: {_random.Next(0,40000)}";
+            return $"{message}:{_random.Next(0,40000)}";
         }
     }
 }

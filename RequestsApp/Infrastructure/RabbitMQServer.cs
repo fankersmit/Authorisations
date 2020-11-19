@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.Design;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -9,7 +10,7 @@ namespace RequestsApp.Infrastructure
 {
     public class RabbitMQServer
     {
-        private AuthorisationRequestsHandler _requestHandler = null;
+        private readonly AuthorisationRequestsHandler _requestHandler;
         private readonly ILogger _logger;
         private const string HostName = "localhost";
         private const string QueueName = "rpc_queue";
@@ -19,19 +20,18 @@ namespace RequestsApp.Infrastructure
         public AuthorisationRequestsHandler RequestHandler => _requestHandler;
 
         // ctors
-        public RabbitMQServer( ILogger<RabbitMQServer> logger)
+        public RabbitMQServer( ILogger<RabbitMQServer> logger, AuthorisationRequestsHandler requestHandler)
         {
             _logger = logger;
-     }
+            _requestHandler = requestHandler;
+        }
 
-        public  void Run(AuthorisationRequestsHandler requestHandler)
+        public  void Run()
         {
             _logger.LogInformation("Started Server at {dateTime}", DateTime.UtcNow);
-            _requestHandler = requestHandler;
             _consumer = CreateServer(HostName, QueueName); 
         }
         
-
         private EventingBasicConsumer CreateServer(string hostName, string  queueName)
         {
             var factory = new ConnectionFactory() {HostName = hostName};
@@ -59,7 +59,14 @@ namespace RequestsApp.Infrastructure
                 }
                 catch (Exception e)
                 {
-                    response = "";
+                    if( e is  ArgumentNullException || e is ArgumentException )
+                    {
+                        response = "";
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
                 finally
                 {

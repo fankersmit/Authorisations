@@ -1,4 +1,4 @@
-namespace Authorisations.Models
+namespace Requests.Domain
 {
     public interface IRequest
     {
@@ -14,6 +14,8 @@ namespace Authorisations.Models
         void Disapprove();
         // Conclude, 
         void Conclude();
+        // Remove
+        void Remove();
          // Status   
          RequestStatus Status { get; }
     }
