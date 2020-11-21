@@ -22,6 +22,7 @@ namespace Tests.Requests
             Assert.Equal(expected, request.Status);
         }
 
+        #region process tests 
         [Fact]
         public void ChangingToSameStateChangesNothing()
         {
@@ -38,6 +39,7 @@ namespace Tests.Requests
 
         }
 
+        // note the next test checks if state has changed, not call is valid 
         [Theory]
         [InlineData(0, true)] // submit
         [InlineData(1, false)] // confirm
@@ -60,8 +62,8 @@ namespace Tests.Requests
 
         [Theory]
         [InlineData(0, false)] // submit
-        [InlineData(1, true)] // confirm
-        [InlineData(2, true)] // cancel      
+        [InlineData(1, true)]  // confirm
+        [InlineData(2, true)]  // cancel      
         [InlineData(3, false)] // approve
         [InlineData(4, false)] // disapprove 
         [InlineData(5, false)] // conclude
@@ -77,6 +79,127 @@ namespace Tests.Requests
            // assert
            Assert.Equal(hasNewState, (originalState != request.Status));
         }
+
+        [Theory]
+        [InlineData(0, false)] // submit
+        [InlineData(1, false)] // confirm
+        [InlineData(2, false)] // cancel      
+        [InlineData(3, true)] // approve
+        [InlineData(4, true)] // disapprove 
+        [InlineData(5, false)] // conclude
+        [InlineData(6, false)] // remove
+        public void Confirmed_Can_Only_Change_ToNext_ValidStates(int commandIndex, bool hasNewState)
+        {
+            // arrange 
+            var request = CreateTestRequestWthStatus(RequestStatus.Confirmed);
+            var transitions = GetRequestCommands(request);
+            var originalState = request.Status;
+            // act, execute each command
+            transitions[commandIndex]();
+            // assert
+            Assert.Equal(hasNewState, (originalState != request.Status));
+        }
+        
+        [Theory]
+        [InlineData(0, false)] // submit
+        [InlineData(1, false)] // confirm
+        [InlineData(2, false)] // cancel      
+        [InlineData(3, false)] // approve
+        [InlineData(4, false)] // disapprove 
+        [InlineData(5, true)] // conclude
+        [InlineData(6, false)] // remove
+        public void Cancelled_Can_Only_Change_ToNext_ValidStates(int commandIndex, bool hasNewState)
+        {
+            // arrange 
+            var request = CreateTestRequestWthStatus(RequestStatus.Cancelled);
+            var transitions = GetRequestCommands(request);
+            var originalState = request.Status;
+            // act, execute each command
+            transitions[commandIndex]();
+            // assert
+            Assert.Equal(hasNewState, (originalState != request.Status));
+        }
+
+        [Theory]
+        [InlineData(0, false)] // submit
+        [InlineData(1, false)] // confirm
+        [InlineData(2, false)] // cancel      
+        [InlineData(3, false)] // approve
+        [InlineData(4, false)] // disapprove 
+        [InlineData(5, true)] // conclude
+        [InlineData(6, false)] // remove
+        public void Approved_Can_Only_Change_ToNext_ValidStates(int commandIndex, bool hasNewState)
+        {
+            // arrange 
+            var request = CreateTestRequestWthStatus(RequestStatus.Approved);
+            var transitions = GetRequestCommands(request);
+            var originalState = request.Status;
+            // act, execute each command
+            transitions[commandIndex]();
+            // assert
+            Assert.Equal(hasNewState, (originalState != request.Status));
+        }
+        
+        [Theory]
+        [InlineData(0, false)] // submit
+        [InlineData(1, false)] // confirm
+        [InlineData(2, false)] // cancel      
+        [InlineData(3, false)] // approve
+        [InlineData(4, false)] // disapprove 
+        [InlineData(5, true)] // conclude
+        [InlineData(6, false)] // remove
+        public void Disapproved_Can_Only_Change_ToNext_ValidStates(int commandIndex, bool hasNewState)
+        {
+            // arrange 
+            var request = CreateTestRequestWthStatus(RequestStatus.Disapproved);
+            var transitions = GetRequestCommands(request);
+            var originalState = request.Status;
+            // act, execute each command
+            transitions[commandIndex]();
+            // assert
+            Assert.Equal(hasNewState, (originalState != request.Status));
+        }
+        
+        [Theory]
+        [InlineData(0, false)] // submit
+        [InlineData(1, false)] // confirm
+        [InlineData(2, false)] // cancel      
+        [InlineData(3, false)] // approve
+        [InlineData(4, false)] // disapprove 
+        [InlineData(5, false)] // conclude
+        [InlineData(6, true)] // remove
+        public void Concluded_Can_Only_Change_ToNext_ValidStates(int commandIndex, bool hasNewState)
+        {
+            // arrange 
+            var request = CreateTestRequestWthStatus(RequestStatus.Concluded);
+            var transitions = GetRequestCommands(request);
+            var originalState = request.Status;
+            // act, execute each command
+            transitions[commandIndex]();
+            // assert
+            Assert.Equal(hasNewState, (originalState != request.Status));
+        }
+        
+        [Theory]
+        [InlineData(0, false)] // submit
+        [InlineData(1, false)] // confirm
+        [InlineData(2, false)] // cancel      
+        [InlineData(3, false)] // approve
+        [InlineData(4, false)] // disapprove 
+        [InlineData(5, false)] // conclude
+        [InlineData(6, false)] // remove
+        public void Removed_Can_Only_Change_ToNext_ValidStates(int commandIndex, bool hasNewState)
+        {
+            // arrange 
+            var request = CreateTestRequestWthStatus(RequestStatus.Removed);
+            var transitions = GetRequestCommands(request);
+            var originalState = request.Status;
+            // act, execute each command
+            transitions[commandIndex]();
+            // assert
+            Assert.Equal(hasNewState, (originalState != request.Status));
+        }
+        #endregion
 
         //  helper methods
         private RequestTransition[] GetRequestCommands(TestRequest request)
@@ -140,8 +263,6 @@ namespace Tests.Requests
             return new TestRequest();
         }
     }
-
-
 
     //  helper classes
     internal class TestRequest : RequestBase

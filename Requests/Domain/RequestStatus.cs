@@ -2,7 +2,7 @@ using System;
 
 namespace Requests.Domain
 {
-    public enum RequestStatus : byte
+    public enum RequestStatus : uint
     {
         New = 128,             // 10000000
         Submitted = 64,        // 01000000

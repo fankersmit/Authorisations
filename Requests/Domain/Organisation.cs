@@ -12,8 +12,19 @@ namespace Requests.Domain
         public Organisation(string name, string description)
         {
             Id  = Guid.NewGuid();
+            Initialize(name, description);
+        }
+        
+        public Organisation(Guid ID, string name, string description)
+        {
+            Id = ID;
+            Initialize(name, description);
+        }
+
+        private void Initialize(string name, string description)
+        {
             Name = name;
-            Description = description;
+            Description = description;            
         }
     }
 }

@@ -21,8 +21,6 @@ namespace Requests.Domain
          }
 
          // methods
-
-         
          public string ToJson()
          {
              var options = new JsonSerializerOptions();

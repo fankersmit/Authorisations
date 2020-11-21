@@ -46,14 +46,15 @@ term| definition or values
 ***
 # Valid transitions
 
- | |new|submit|Confirm|Cancel|Approve|Disapprove|Concludd|Remove|
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-|New|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>
-|Submitted|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>
-|Confirmed|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>
-|Cancelled|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>
-|Approved|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>
-|Disapproved|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>
-|Concluded|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>
-|Removed|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>
+ |Command: |new|submit|Confirm|Cancel|Approve|Disapprove|Conclude|Remove|
+ |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+ |State |||||||||
+|New|<span style="color:yellow">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>
+|Submitted|<span style="color:red">No</span>|<span style="color:yellow">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>
+|Confirmed|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:yellow">Yes</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>
+|Cancelled|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:yellow">Yes</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>
+|Approved|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:yellow">Yes</span>|<span style="color:red">No</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>
+|Disapproved|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:yellow">Yes</span>|<span style="color:green">Yes</span>|<span style="color:red">No</span>
+|Concluded|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:yellow">Yes</span>|<span style="color:green">Yes</span>
+|Removed|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:yellow">Yes</span>
 

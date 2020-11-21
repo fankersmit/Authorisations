@@ -3,7 +3,7 @@ using System;
 namespace Requests.Domain
 {
    
-    public enum ValidTransitions : byte
+    public enum ValidTransitions : uint
     {
         New = 128,          // 10000000 
         Submit = 192,       // 11000000
@@ -12,6 +12,6 @@ namespace Requests.Domain
         Approve = 40,       // 00101000 
         Disapprove =36,     // 00100100
         Conclude = 30,      // 00011110
-        Remove = 203        // 10000011 
+        Remove = 131        // 10000011 
     }
 }
