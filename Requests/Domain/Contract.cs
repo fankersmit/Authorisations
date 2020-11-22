@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Mail;
 
 namespace Requests.Domain
 {
@@ -7,7 +8,7 @@ namespace Requests.Domain
     {
         public Guid ContractID  { get; private set; }
         public Organisation Organisation { get; private set; }
-        public string Email_AuthorisationManager { get; private set; }
+        public MailAddress AuthorizerMailAddress { get; private set; }
         public DateTime StartDate { get; private set; }
         public DateTime EndDate { get; }
         public  IList<Product> Products { get; private set; } 
@@ -19,10 +20,10 @@ namespace Requests.Domain
             AddDefaultProducts();
         }
         
-        public Contract(Organisation org, string email, DateTime start, DateTime end) : this()
+        public Contract(Organisation org, MailAddress email, DateTime start, DateTime end) : this()
         {
             Organisation = org;
-            Email_AuthorisationManager = email;
+            AuthorizerMailAddress = email;
             StartDate = start;
             EndDate = end;
             

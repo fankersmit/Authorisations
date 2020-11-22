@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Requests.Domain;
 using Tests.Helpers;
 
@@ -20,6 +21,9 @@ namespace Tests.CreateTestRequests
             for (var idx = 0; idx < count; idx++)
             {
                 var request = CreateRequest(requestType);
+                AccountRequest ar = request as AccountRequest;
+                var path =  @"C:\Projects\Authorisations\Documentation";
+                ar.SaveTo(path);
                 Console.WriteLine(request.Id);
             }
 
@@ -95,9 +99,10 @@ namespace Tests.CreateTestRequests
         private static RequestBase CreateAccountRequest()
         {
             // create organisation
-            var org = DomainTypesFactory.CreateOrganisation();
-            var applicant = DomainTypesFactory.CreateApplicant();
-            var contract = DomainTypesFactory.CreateContract(org);
+            var factory = DomainTypesFactory.Instance;
+            var org = factory.CreateOrganisation();
+            var applicant = factory.CreateApplicant();
+            var contract = factory.CreateContract(org);
             return new AccountRequest(applicant, contract);
         }
 

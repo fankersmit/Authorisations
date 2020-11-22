@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Mail;
 
 namespace Requests.Domain
 {
@@ -7,7 +8,7 @@ namespace Requests.Domain
     {
         Guid ContractID { get; }
         Organisation Organisation { get; }
-        string Email_AuthorisationManager { get; }
+        MailAddress AuthorizerMailAddress { get; }
         DateTime StartDate { get; }
         DateTime EndDate { get; }
         IList<Product> Products { get; }

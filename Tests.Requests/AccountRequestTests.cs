@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net.Mail;
 using System.Text.Json;
 using Requests.Domain;
 using Xunit;
@@ -76,7 +77,7 @@ namespace Tests.Requests
             var name = "ZorgMij";
             var description = "Voor al uw geestelijke en lichamelijke pijntjes";
             var organisation = new Organisation(name, description);
-            var email = "joke.deGraaf@zorgmij.eu";
+            var email = new MailAddress("joke.deGraaf@zorgmij.eu");
             var startDate = DateTime.Now.Subtract(new TimeSpan(48, 0, 0));
             var endDate = DateTime.Now.AddYears(1);
             return new Contract(organisation, email, startDate, endDate);
