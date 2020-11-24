@@ -16,6 +16,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Authorisations\Authorisations.csproj" />
+      <ProjectReference Include="..\Tests.CreateTestRequests\Tests.CreateTestRequests.csproj" />
     </ItemGroup>
 
 </Project>

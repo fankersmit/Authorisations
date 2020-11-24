@@ -27,22 +27,40 @@ namespace Authorisations.Controllers
             _rpcClient = rabbitMqRpcClient;
         }
 
+        [HttpPost]
+        [Route("request/{requestType}/submit")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public object SubmitRequest(string requestType, [FromBody] string content)
+        {
+            // abort if request is fawlty
+            if (!RequestChecker.IsKnownRequestType(requestType )) 
+                return NotFound();
+            
+            _rpcClient.Post(content, "submit");
+             return Accepted();
+        }
+
         [HttpGet]
         [Route("requests/under-consideration")]
-        [Route("requests/{requestType}/under-consideration")]
+        [Route("requests/under-consideration/{requestType}")]
         [ProducesResponseType(typeof(Dictionary<string,string>),StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Dictionary<string,string>),StatusCodes.Status404NotFound)]
         public object RequestsUnderConsideration(string requestType)
         {
-            // abort if request is fawlty
-            if (!RequestChecker.IsKnownRequestType(requestType))
+            string underConsideration;
+            if (requestType != null)
             {
-                return NotFound();
+                if (!RequestChecker.IsKnownRequestType(requestType))
+                {
+                    return NotFound();
+                }
+                underConsideration  = $"{requestType}-UnderConsideration";
             }
-
-            // create message call
-            var sep = requestType == null ? string.Empty : "-";  
-            var underConsideration = $"{requestType}{sep}UnderConsideration";
+            else
+            {
+                underConsideration = "UnderConsideration";    
+            }
             // put request on queue
             var result = _rpcClient.Call(underConsideration);
             var split  = result.Split(':');
@@ -58,6 +76,5 @@ namespace Authorisations.Controllers
             _logger.LogInformation($"Status pinged: {responseObject.ElementAt(0).Value}");
             return responseObject;
         }
-        
     }
 }

@@ -88,7 +88,6 @@ namespace Tests.Helpers
             return new Contract(organisation, email, startDate, endDate);           
         }
    
-
         public Contract CreateContract( Organisation organisation )
         {
             var duration = _random.Next(0, 5);
@@ -103,7 +102,21 @@ namespace Tests.Helpers
         {
             return new Product("AGB", "Algemeen gegevens beheer");    
         }
-
+        
+        public AccountRequest CreateAccountRequest( Person applicant, Contract contract )
+        {
+            return new AccountRequest(applicant, contract);
+        }
+        
+        public AccountRequest CreateAccountRequest()
+        {
+            var applicant = CreateApplicant();
+            var org = CreateOrganisation();
+            var contract = CreateContract(org);
+            return new AccountRequest(applicant, contract);
+        }
+        
+        // helper methods
         private MailAddress CreateEmail(string firstName, string lastName, string domainName)
         {
            var email = $"{firstName}.{lastName}@{domainName}".Trim().Trim('.');

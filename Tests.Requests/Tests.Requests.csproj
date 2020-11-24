@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Requests\Requests.csproj" />
+      <ProjectReference Include="..\Tests.CreateTestRequests\Tests.CreateTestRequests.csproj" />
     </ItemGroup>
 
 </Project>
