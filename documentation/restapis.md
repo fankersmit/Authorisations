@@ -58,3 +58,22 @@ term| definition or values
 |Concluded|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:yellow">Yes</span>|<span style="color:green">Yes</span>
 |Removed|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:yellow">Yes</span>
 
+# state diagram of  authorisation process
+
+```mermaid
+stateDiagram
+    [*] --> New
+    Concluded --> [*]
+
+    New --> Confirmed
+    note right of New 
+      Every state can transistion back onto itself
+    end note   
+    New --> Cancelled
+    Confirmed --> Approved
+    Confirmed --> Disapproved
+    Cancelled --> Concluded
+    Approved --> Concluded
+    Disapproved --> Concluded
+```
+  
