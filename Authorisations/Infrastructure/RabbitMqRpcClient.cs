@@ -19,8 +19,8 @@ namespace Authorisations.Infrastructure
         public RabbitMqRpcClient()
         {
             _connectionFactory = new ConnectionFactory() { HostName = "localhost" };
-            
-            channel = connection.CreateModel();
+            connection = _connectionFactory.CreateConnection();
+            channel = this.connection.CreateModel();           
             replyQueueName = channel.QueueDeclare().QueueName;
             consumer = new EventingBasicConsumer(channel);
 
@@ -56,22 +56,21 @@ namespace Authorisations.Infrastructure
 
             return respQueue.Take();
         }
+       
         
         public void Post( string message, string queueName )
         {
-            using var connection = _connectionFactory.CreateConnection();
-            using var channel = this.connection.CreateModel();
-            channel.QueueDeclare(
+           var body = Encoding.UTF8.GetBytes(message);
+           channel.QueueDeclare(
                 queue: queueName, durable: false,  false, 
                 autoDelete: false, arguments: null);
-
-            var body = Encoding.UTF8.GetBytes(message);
 
             channel.BasicPublish
                 (exchange: "", routingKey: queueName, 
                 basicProperties: null, body: body);
         }
-
+        
+        
         public void Register()
         {
         }

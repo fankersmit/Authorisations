@@ -46,7 +46,7 @@ namespace Authorisations
         }
     }
     
-    public static class ApplicationBuilderExtentions
+    public static class ApplicationBuilderExtensions
     {
         //store a single long-living object
         private static RabbitMqRpcClient _rpcClient { get; set; }

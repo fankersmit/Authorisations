@@ -13,7 +13,8 @@ namespace RequestsApp.Infrastructure
         private readonly AuthorisationRequestsHandler _requestHandler;
         private readonly ILogger _logger;
         private const string HostName = "localhost";
-        private const string QueueName = "rpc_queue";
+        private const string RequestsInfo_QueueName = "rpc_queue";
+        private const string RequestHandling_QueueName = "handling_queue";
         private EventingBasicConsumer _consumer;
         
         // properties
@@ -29,14 +30,28 @@ namespace RequestsApp.Infrastructure
         public  void Run()
         {
             _logger.LogInformation("Started Server at {dateTime}", DateTime.UtcNow);
-            _consumer = CreateServer(HostName, QueueName); 
+            _consumer = CreateServer(HostName); 
         }
         
-        private EventingBasicConsumer CreateServer(string hostName, string  queueName)
+        private EventingBasicConsumer CreateServer(string hostName)
         {
             var factory = new ConnectionFactory() {HostName = hostName};
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
+
+            CreateRequestsInfoQueue( channel, RequestsInfo_QueueName );
+            // create more queues as program evolves
+            //CreateRequestHandlingQueue( channel, RequestHandling_QueueName );
+            return _consumer;
+        }
+
+        private void CreateRequestHandlingQueue(IModel channel, string requestHandlingQueueName)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CreateRequestsInfoQueue(IModel channel, string queueName)
+        {
             channel.QueueDeclare(queue: queueName, durable: false,
                 exclusive: false, autoDelete: false, arguments: null);
             channel.BasicQos(0, 1, false);
@@ -77,7 +92,6 @@ namespace RequestsApp.Infrastructure
                         multiple: false);
                 }
             };
-            return _consumer;
         }
     }
 }
