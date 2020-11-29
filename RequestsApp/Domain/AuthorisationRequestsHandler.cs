@@ -17,5 +17,11 @@ namespace RequestsApp.Domain
         {
             return $"{message}:{_random.Next(0,40000)}";
         }
+        
+        public string ProcessMessage(string message)
+        {
+            Console.WriteLine(message);
+            return string.Empty;
+        }
     }
 }

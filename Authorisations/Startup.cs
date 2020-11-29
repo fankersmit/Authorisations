@@ -21,14 +21,8 @@ namespace Authorisations
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.PropertyNamingPolicy = null;
-                    options.JsonSerializerOptions.IgnoreNullValues = true;
-                    options.JsonSerializerOptions.WriteIndented = true;
-                });
-            services.AddSingleton<RabbitMqRpcClient>();
+            services.AddControllers();
+            services.AddSingleton<RabbitMqClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,11 +43,11 @@ namespace Authorisations
     public static class ApplicationBuilderExtensions
     {
         //store a single long-living object
-        private static RabbitMqRpcClient _rpcClient { get; set; }
+        private static RabbitMqClient Client { get; set; }
 
         public static IApplicationBuilder UseRabbitRpcClient(this IApplicationBuilder app)
         {
-            _rpcClient = app.ApplicationServices.GetService<RabbitMqRpcClient>();
+            Client = app.ApplicationServices.GetService<RabbitMqClient>();
 
             var lifetime = app.ApplicationServices.GetService<IHostApplicationLifetime>();
 
@@ -67,12 +61,12 @@ namespace Authorisations
 
         private static void OnStarted()
         {
-            _rpcClient.Register();
+            Client.Register();
         }
 
         private static void OnStopping()
         {
-            _rpcClient.Deregister();    
+            Client.Deregister();    
         }
     }
 }

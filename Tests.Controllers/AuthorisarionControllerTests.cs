@@ -26,16 +26,17 @@ namespace Tests.Controllers
 
         [Theory]
         [InlineData("account", HttpStatusCode.Accepted )]
-        [InlineData("organisation", HttpStatusCode.Accepted )]
-        [InlineData("product", HttpStatusCode.Accepted )]
+        [InlineData("organisation", HttpStatusCode.NotFound )]
+        [InlineData("product", HttpStatusCode.NotFound )]
         [InlineData("Henk", HttpStatusCode.NotFound )]
         public async Task Submit_ReturnsAccepted( string route, HttpStatusCode expected)
         {
             // arrange
             var request = _requestFactory.CreateAccountRequest();
-            var content = new StringContent( request.ToJson(), Encoding.Default, "application/json");
+            var body = Encoding.UTF8.GetString(request.ToJson()); 
+            var content = new StringContent( body, Encoding.UTF8, "application/json");
             // act
-            var response = await _client.PostAsync($"{_root}/request/{route}/submit", content);
+            var response = await _client.PostAsync($"{_root}/request/submit/{route}", content);
             // assert
             Assert.Equal(expected, response.StatusCode);
         }

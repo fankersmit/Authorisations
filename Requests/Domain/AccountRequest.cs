@@ -21,14 +21,6 @@ namespace Requests.Domain
          }
 
          // methods
-         public string ToJson()
-         {
-             var options = new JsonSerializerOptions();
-             options.WriteIndented = true;
-             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-             return JsonSerializer.Serialize<AccountRequest>(this, options);
-         }
-
          public void SaveTo(string directoryPath)
          {
              var  fullPath = Path.Combine(directoryPath,$"{Id}.json");
@@ -36,7 +28,5 @@ namespace Requests.Domain
              using StreamWriter outputFile = new StreamWriter(fullPath);
              outputFile.WriteLine(ToJson());
          }
-         
-         
     }
 }

@@ -1,16 +1,13 @@
 ﻿using System;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using System.Text;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using RequestsApp.Domain;
 using RequestsApp.Infrastructure;
-    
+
 
 namespace RequestsApp
 {
+   
     class Program
     {
         public static void Main(string[] args)
@@ -18,6 +15,12 @@ namespace RequestsApp
             // setup
             var services = new ServiceCollection();
             ConfigureServices(services);
+            
+            // make sure there is a database
+            using(var client = new RequestContext())
+            {
+                client.Database.EnsureCreated();
+            }
 
             using (ServiceProvider serviceProvider = services.BuildServiceProvider())
             {
@@ -34,7 +37,9 @@ namespace RequestsApp
         {
             services.AddLogging(configure =>configure.AddConsole())
                 .AddTransient<RabbitMQServer>()
-                .AddTransient<AuthorisationRequestsHandler>();
+                .AddTransient<AuthorisationRequestsHandler>()
+                .AddEntityFrameworkSqlite().AddDbContext<RequestContext>();
         }
     }
+ 
 }

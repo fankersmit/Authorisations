@@ -1,6 +1,6 @@
 namespace Authorisations.Infrastructure
 {
-    public interface IRabbitMqRpcClient
+    public interface IRabbitMqClient
     {
     }
 }

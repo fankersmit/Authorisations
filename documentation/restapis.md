@@ -30,9 +30,9 @@ term| definition or values
 |<span style="color:green">Yes</span>|REST|Q|root/requests/under-consideration |GET| 200|404| return total number of requests being processed
 |<span style="color:green">Yes</span>|REST|Q|root/requests/under-consideration/{type} |GET| 200 |404 | return total number of account requests of {type }being processed
 |<span style="color:red">No</span>|REST|Q|root/requests/{status} |GET| 200|404|  returns all requests with status = {status}
-|<span style="color:red">No</span>|REST|Q|root/requests/{type}/{status} |GET| 200|404|  returns all requests of {type} with status = {status}}
+|<span style="color:red">No</span>|REST|Q|root/requests/{status}/{type} |GET| 200|404|  returns all requests of {type} with status = {status}}
 |<span style="color:red">No</span>|REST|Q|root/request/{id}|GET| 200|404|  return  account request info
-|<span style="color:red">No</span>|REST|C|root/request/{type}/submit|POST| 202|404,405|  submit request where type is in {account, product, organisation}
+|<span style="color:red">No</span>|REST|C|root/request/submit/{type}|POST| 202|404,405|  submit request where type is in {account, product, organisation}
 |<span style="color:red">No</span>|REST|C|root/request/{id}/confirm|POST| 202|404,405|  confirm request where id = {id} 
 |<span style="color:red">No</span>|REST|C|root/request/{id}/cancel|POST| 202|404,405|  cancel request where id = {id} 
 |<span style="color:red">No</span>|REST|C|root/request/{id}/approve|POST| 202|404,405|  approve request where id = {id} 
@@ -63,7 +63,7 @@ term| definition or values
 ```mermaid
 stateDiagram
     [*] --> New
-    Concluded --> [*]
+    Removed --> [*]
 
     New --> Confirmed
     note right of New 
@@ -75,5 +75,6 @@ stateDiagram
     Cancelled --> Concluded
     Approved --> Concluded
     Disapproved --> Concluded
+    Concluded --> Removed
 ```
   

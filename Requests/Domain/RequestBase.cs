@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 
 namespace Requests.Domain
 {
@@ -27,6 +28,12 @@ namespace Requests.Domain
         }
 
         // methods
+        public virtual byte[] ToJson()
+        {
+            var options = new JsonSerializerOptions {WriteIndented = true};
+            return JsonSerializer.SerializeToUtf8Bytes(this, options);   
+        }
+
         public virtual void Submit()
         {
             if( !IsInValidState(ValidTransitions.Submit)) return; 

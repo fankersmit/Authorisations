@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -14,8 +15,8 @@ namespace RequestsApp.Infrastructure
         private readonly ILogger _logger;
         private const string HostName = "localhost";
         private const string RequestsInfo_QueueName = "rpc_queue";
-        private const string RequestHandling_QueueName = "handling_queue";
-        private EventingBasicConsumer _consumer;
+        private const string RequestHandling_QueueName = "publish_queue";
+        private IList<EventingBasicConsumer> _consumers;
         
         // properties
         public AuthorisationRequestsHandler RequestHandler => _requestHandler;
@@ -29,29 +30,53 @@ namespace RequestsApp.Infrastructure
 
         public  void Run()
         {
+            _consumers = CreateServer(HostName); 
             _logger.LogInformation("Started Server at {dateTime}", DateTime.UtcNow);
-            _consumer = CreateServer(HostName); 
         }
         
-        private EventingBasicConsumer CreateServer(string hostName)
+        private IList<EventingBasicConsumer> CreateServer(string hostName)
         {
+            var consumers = new List<EventingBasicConsumer>();
             var factory = new ConnectionFactory() {HostName = hostName};
             var connection = factory.CreateConnection();
+           
+            consumers.Add(CreateRequestsInfoQueue( connection, RequestsInfo_QueueName ));
+            
+            // create more queues as program evolves
+            consumers.Add(CreateRequestHandlingQueue( connection , RequestHandling_QueueName ));
+            return consumers;
+        }
+
+        private EventingBasicConsumer CreateRequestHandlingQueue(IConnection connection, string requestHandlingQueueName)
+        {
             var channel = connection.CreateModel();
 
-            CreateRequestsInfoQueue( channel, RequestsInfo_QueueName );
-            // create more queues as program evolves
-            //CreateRequestHandlingQueue( channel, RequestHandling_QueueName );
-            return _consumer;
+            channel.QueueDeclare(queue: requestHandlingQueueName,
+                durable: false,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += (model, ea) =>
+            {
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+                _logger.LogInformation($"Received message {message} at {DateTime.UtcNow}");
+                // handle message
+                _requestHandler.ProcessMessage(message);
+            };
+            channel.BasicConsume(queue: requestHandlingQueueName,
+                autoAck: true,
+                consumer: consumer);
+
+            _logger.LogInformation($"Created Request handling queue at {DateTime.UtcNow}");
+            return consumer;
         }
 
-        private void CreateRequestHandlingQueue(IModel channel, string requestHandlingQueueName)
+        private EventingBasicConsumer CreateRequestsInfoQueue(IConnection connection, string queueName)
         {
-            throw new NotImplementedException();
-        }
-
-        private void CreateRequestsInfoQueue(IModel channel, string queueName)
-        {
+            var channel = connection.CreateModel();
             channel.QueueDeclare(queue: queueName, durable: false,
                 exclusive: false, autoDelete: false, arguments: null);
             channel.BasicQos(0, 1, false);
@@ -92,6 +117,9 @@ namespace RequestsApp.Infrastructure
                         multiple: false);
                 }
             };
+            
+            _logger.LogInformation($"Created Request Info handling queue at {DateTime.UtcNow}");
+            return consumer;
         }
     }
 }

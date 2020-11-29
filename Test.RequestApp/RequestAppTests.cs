@@ -26,5 +26,22 @@ namespace Test.RequestApp
             Assert.NotNull(handler);
             Assert.Equal(requestHandler, handler);
         }
+        
+        [Fact]
+        public void CanUseDatabaseInjectedIntoApp()
+        {
+            // Arrange
+            var requestHandler = new AuthorisationRequestsHandler();
+            using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+            var logger = loggerFactory.CreateLogger<RabbitMQServer>();
+
+            // Act
+            var rabbitMQServer = new RabbitMQServer(logger, requestHandler);
+            rabbitMQServer.Run();
+            var handler = rabbitMQServer.RequestHandler; 
+            // Assert
+            Assert.NotNull(handler);
+            Assert.Equal(requestHandler, handler);
+        }
     }
 }
