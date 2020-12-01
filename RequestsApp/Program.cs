@@ -7,39 +7,24 @@ using RequestsApp.Infrastructure;
 
 namespace RequestsApp
 {
-   
     class Program
     {
         public static void Main(string[] args)
         {
-            // setup
-            var services = new ServiceCollection();
-            ConfigureServices(services);
+            // setup, does all configuring
+            var startup = new Startup();
+
+            // create the database
+            var  requestContext = startup.Provider.GetService<RequestDbContext>();
+            requestContext.Database.EnsureCreated();
             
-            // make sure there is a database
-            using(var client = new RequestContext())
-            {
-                client.Database.EnsureCreated();
-            }
+            var requestHandler = new AuthorisationRequestsHandler();
+            var service = startup.Provider.GetService<RabbitMQServer>();
+            service.Run();
 
-            using (ServiceProvider serviceProvider = services.BuildServiceProvider())
-            {
-                var requestHandler = new AuthorisationRequestsHandler();
-                var app = serviceProvider.GetService<RabbitMQServer>();
-                app.Run();
+            Console.WriteLine(" Press [enter] to exit.");
+            Console.ReadLine();
+        }
 
-                Console.WriteLine(" Press [enter] to exit.");
-                Console.ReadLine();
-            }
-        }
-    
-        private static void ConfigureServices(ServiceCollection services)
-        {
-            services.AddLogging(configure =>configure.AddConsole())
-                .AddTransient<RabbitMQServer>()
-                .AddTransient<AuthorisationRequestsHandler>()
-                .AddEntityFrameworkSqlite().AddDbContext<RequestContext>();
-        }
     }
- 
 }

@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -8,25 +11,43 @@ namespace RequestsApp
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
 
-        public Startup(IConfiguration configuration)
+        private readonly IConfiguration  _configuration;
+        private readonly IServiceProvider  _provider;
+        
+        public IServiceProvider Provider => _provider;
+        public IConfiguration Configuration => _configuration;
+
+        public Startup()
         {
-            Configuration = configuration;
+            _configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+            
+            var services = new ServiceCollection();
+            ConfigureServices( services );
+            _provider = services.BuildServiceProvider();
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var connectionString  = GetConnectionString();
+            
             services.AddLogging(configure => configure.AddConsole())
                 .AddTransient<RabbitMQServer>()
                 .AddTransient<AuthorisationRequestsHandler>()
-                .AddEntityFrameworkSqlite().AddDbContext<RequestContext>();
-            
-            // make sure there is a database
-            using(var client = new RequestContext())
-            {
-                client.Database.EnsureCreated();
-            }
+                .AddEntityFrameworkSqlite()
+                .AddDbContext<RequestDbContext>(
+       (serviceProvider, options) =>
+                        options.UseSqlite(connectionString)
+                               .UseInternalServiceProvider(serviceProvider));
+        }
+
+        private string  GetConnectionString()
+        {
+            return Configuration.GetConnectionString("DefaultConnection");
         }
     }
 }

@@ -4,29 +4,29 @@ namespace Requests.Domain
 {
     public class Person : IPersonModel
     {
-        private readonly string _firstName;
-        private readonly string _lastName;
-        private readonly string _salutation;
-
         // ctors
         public Person(string firstName, string lastName, string salutation = "")
         {
-            _firstName = firstName;
-            _lastName = lastName;
-            _salutation = salutation;
+            FirstName = firstName;
+            LastName = lastName;
+            Salutation = salutation;
+        }
+
+        private Person()
+        {
         }
 
         // properties
-        public string FirstName => _firstName;
+        public int PersonId { get; private set; }
 
-        public string LastName => _lastName;
+        public string FirstName { get; private set;}
 
-        public string FullName => Fullname();
+        public string LastName { get; private set;}
 
-        public string Salutation => _salutation;
+        public string Salutation { get; private set;}
 
         // methods
-        private string Fullname()
+        public  string FullName()
         {
             var fullName =  $"{Salutation} {FirstName} {LastName}";
             return fullName.Trim().Replace("  ", " ");

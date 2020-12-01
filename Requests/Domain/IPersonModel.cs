@@ -4,7 +4,7 @@ namespace Requests.Domain
     {
         string FirstName { get; }
         string LastName { get; }
-        string FullName { get; }
+        string FullName();
         string Salutation { get; }
     }
 }

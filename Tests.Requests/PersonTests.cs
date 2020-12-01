@@ -22,7 +22,7 @@ namespace Tests.Requests
             // arrange, act
             var p = new Person(firstName, lastName, salutation);
             // assert
-            Assert.Equal(expected, p.FullName.Count(i => i == ' '));
+            Assert.Equal(expected, p.FullName().Count(i => i == ' '));
         }
         
     }

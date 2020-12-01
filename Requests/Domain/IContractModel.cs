@@ -8,7 +8,7 @@ namespace Requests.Domain
     {
         Guid ContractID { get; }
         Organisation Organisation { get; }
-        MailAddress AuthorizerMailAddress { get; }
+        string AuthorizerMailAddress { get; }
         DateTime StartDate { get; }
         DateTime EndDate { get; }
         IList<Product> Products { get; }

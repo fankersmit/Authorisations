@@ -117,10 +117,10 @@ namespace Tests.Helpers
         }
         
         // helper methods
-        private MailAddress CreateEmail(string firstName, string lastName, string domainName)
+        private string CreateEmail(string firstName, string lastName, string domainName)
         {
            var email = $"{firstName}.{lastName}@{domainName}".Trim().Trim('.');
-           return new MailAddress(email);
+           return email;
         }
     }
 

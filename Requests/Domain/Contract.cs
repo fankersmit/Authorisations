@@ -8,7 +8,7 @@ namespace Requests.Domain
     {
         public Guid ContractID  { get; private set; }
         public Organisation Organisation { get; private set; }
-        public MailAddress AuthorizerMailAddress { get; private set; }
+        public string AuthorizerMailAddress { get; private set; }
         public DateTime StartDate { get; private set; }
         public DateTime EndDate { get; }
         public  IList<Product> Products { get; private set; } 
@@ -20,7 +20,7 @@ namespace Requests.Domain
             AddDefaultProducts();
         }
         
-        public Contract(Organisation org, MailAddress email, DateTime start, DateTime end) : this()
+        public Contract(Organisation org, string email, DateTime start, DateTime end) : this()
         {
             Organisation = org;
             AuthorizerMailAddress = email;
