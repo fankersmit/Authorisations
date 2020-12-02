@@ -1,26 +1,27 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Requests.Domain;
+using System.Diagnostics;
+using Authorisations.Models;
 
 namespace Tests.Helpers
 {
-    public sealed class DomainTypesFactory
+    public sealed class ModelTypesFactory
     {
-        private static readonly DomainTypesFactory _instance = new DomainTypesFactory();
+        private static readonly ModelTypesFactory _instance = new ModelTypesFactory();
         
         // Explicit static constructor to tell C# compiler
         // not to mark type as beforefieldinit
-        static DomainTypesFactory()
+        static ModelTypesFactory()
         {
         }
 
-        private DomainTypesFactory()
+        private ModelTypesFactory()
         {
             _random = new Random( DateTime.Now.Minute);  
         }
         
-        public static DomainTypesFactory Instance
+        public static ModelTypesFactory Instance
         {
             get
             {
@@ -55,26 +56,41 @@ namespace Tests.Helpers
         }); 
         #endregion
 
-        public Person CreateApplicant()
+        public PersonModel CreateApplicant()
         {
             var idx1 = _random.Next(0, 10);
             var idx2 = _random.Next(0, 10);
-            return new Person(firstNames[idx1], lastNames[idx2]); 
+            return new PersonModel()
+            {
+                FirstName = firstNames[idx1],
+                LastName = lastNames[idx2]
+            };
         }
 
-        public Organisation CreateOrganisation()
+
+        public OrganisationModel CreateOrganisation()
         {
             var idx = _random.Next(0, 9);
             var org = Orgs[idx];
-            return  new Organisation( org.ID,org.Name, org.Description);
+            return  new OrganisationModel() 
+                {  
+                    OrganisationId = org.ID,
+                    Name =  org.Name, 
+                    Description  = org.Description 
+                };
         }
         
-        public Organisation CreateOrganisation( OrganisationData org)
+        public OrganisationModel CreateOrganisation( OrganisationData org)
         {
-            return  new Organisation( org.ID,org.Name, org.Description);
+            return  new OrganisationModel() 
+            {  
+                OrganisationId = org.ID,
+                Name =  org.Name, 
+                Description  = org.Description 
+            };
         }
 
-        public Contract CreateContract(OrganisationData orgData )
+        public ContractModel CreateContract(OrganisationData orgData )
         {
             var duration = _random.Next(0, 5);
             var idx = _random.Next(0, 10); 
@@ -82,35 +98,63 @@ namespace Tests.Helpers
             var organisation = CreateOrganisation(orgData);
             var startDate = DateTime.Now.Subtract(new TimeSpan(48, 0, 0));
             var endDate = DateTime.Now.AddYears(duration);
-            return new Contract(organisation, email, startDate, endDate);           
+            return new ContractModel()
+            {
+                Organisation = organisation, 
+                AuthorizerMailAddress = email, 
+                StartDate = startDate, 
+                EndDate = endDate
+            };           
         }
    
-        public Contract CreateContract( Organisation organisation )
+        public ContractModel CreateContract( OrganisationModel organisation )
         {
             var duration = _random.Next(0, 5);
             var idx = _random.Next(0, 10); 
             var email = CreateEmail( firstNames[idx], lastNames[idx], "gmail.com");
             var startDate = DateTime.Now.Subtract(new TimeSpan(48, 0, 0));
             var endDate = DateTime.Now.AddYears(duration);
-            return new Contract(organisation, email, startDate, endDate);           
+            return new ContractModel()
+                { 
+                    Organisation = organisation, 
+                    AuthorizerMailAddress = email, 
+                    StartDate = startDate, 
+                    EndDate = endDate
+                    
+                };           
         }
 
-        public Product CreateProduct()
+        public ProductModel CreateProduct()
         {
-            return new Product("AGB", "Algemeen gegevens beheer");    
+            return new ProductModel()
+                {
+                    Name = "AGB", 
+                    Description  = "Algemeen gegevens beheer",
+                    StartDate = DateTime.UtcNow.AddDays(-365),
+                    EndDate = DateTime.UtcNow.AddDays(365),                   
+                };    
         }
         
-        public AccountRequest CreateAccountRequest( Person applicant, Contract contract )
+        public RequestModel CreateRequest( PersonModel applicant, ContractModel contract )
         {
-            return new AccountRequest(applicant, contract);
+            return new RequestModel()
+            {
+                Applicant = applicant,
+                Contract = contract
+            };
         }
         
-        public AccountRequest CreateAccountRequest()
+        public RequestModel CreateRequest()
         {
             var applicant = CreateApplicant();
             var org = CreateOrganisation();
             var contract = CreateContract(org);
-            return new AccountRequest(applicant, contract);
+            return new RequestModel()
+            { 
+                Applicant = applicant, 
+                Contract =  contract
+                
+            };
         }
         
         // helper methods

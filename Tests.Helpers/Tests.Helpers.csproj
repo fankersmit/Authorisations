@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Authorisations\Authorisations.csproj" />
       <ProjectReference Include="..\Requests\Requests.csproj" />
     </ItemGroup>
 

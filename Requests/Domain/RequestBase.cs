@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace Requests.Domain
 {
-    public abstract class RequestBase : IRequestModel, IRequest
+    public abstract class RequestBase : IRequest
     {
         // properties
         public Guid Id { get; protected set; }

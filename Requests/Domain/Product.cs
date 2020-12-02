@@ -2,7 +2,7 @@ using System;
 
 namespace Requests.Domain
 {
-    public class Product : IProductModel
+    public class Product 
     {
         public int ProductId { get; set; }
         public string Name { get; set; }

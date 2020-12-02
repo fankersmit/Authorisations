@@ -42,26 +42,25 @@ namespace Tests.Controllers
         }
 
         [Theory]
-        [InlineData("requests", HttpStatusCode.OK )]
-        [InlineData("requests/properties", HttpStatusCode.BadRequest )]
-        [InlineData("requests/2345-3456", HttpStatusCode.BadRequest )]
-        public async Task GetWithWrongRequestType_ReturnsBadRequest(string route, HttpStatusCode expected)
+        [InlineData("properties", HttpStatusCode.BadRequest )]
+        [InlineData("2345-3456", HttpStatusCode.BadRequest )]
+        public async Task GetUnderConsideration_Wrong_RequestType_Returns_BadRequest(string route, HttpStatusCode expected)
         {
             // arrange, act
-            var response = await _client.GetAsync($"{_root}/{route}/under-consideration");
+            var response = await _client.GetAsync($"{_root}/requests/under-consideration/{route}");
             // assert
             Assert.Equal(expected, response.StatusCode);
         }
 
         [Theory]
-        [InlineData("requests", HttpStatusCode.OK, 0 )]
-        [InlineData("requests/account", HttpStatusCode.OK, 0 )]
-        [InlineData("requests/product", HttpStatusCode.OK, 0 )]
-        [InlineData("requests/organisation", HttpStatusCode.OK, 0 )]
-        public async Task GetRequestUnderConsideration_ReturnsSuccessAndCount(string route, HttpStatusCode statusCode, int count )
+        [InlineData("", HttpStatusCode.OK, 0 )]
+        [InlineData("/account", HttpStatusCode.OK, 0 )]
+        [InlineData("/product", HttpStatusCode.OK, 0 )]
+        [InlineData("/organisation", HttpStatusCode.OK, 0 )]
+        public async Task GetRequestUnderConsideration_Returns_SuccessAndCount(string route, HttpStatusCode statusCode, int count )
         {
             // arrange, act
-            var response = await _client.GetAsync($"{_root}/{route}/under-consideration");
+            var response = await _client.GetAsync($"{_root}/requests/under-consideration{route}");
             // assert
             try
             {

@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Requests.Domain
 {
-    public class Person : IPersonModel
+    public class Person 
     {
         // ctors
         public Person(string firstName, string lastName, string salutation = "")

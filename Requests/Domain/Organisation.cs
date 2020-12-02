@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Requests.Domain
 {
-    public class Organisation : IOrganisationModel
+    public class Organisation
     {
         public Guid Id { get; private set; }
         public string Name { get; private set; }

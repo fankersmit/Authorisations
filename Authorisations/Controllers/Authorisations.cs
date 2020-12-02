@@ -1,15 +1,11 @@
-using System;
-using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
-using System.Threading.Tasks;
-using Authorisations.Infrastructure;
-using Authorisations.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Requests.Domain;
+using Authorisations.Infrastructure;
+using Authorisations.Models;
 
 namespace Authorisations.Controllers
 {
@@ -31,11 +27,11 @@ namespace Authorisations.Controllers
         [HttpPost]
         [Route("request/submit/account")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
-        public object SubmitRequest(string requestType, [FromBody] AccountRequest request)
+        public object SubmitRequest(string requestType, [FromBody] RequestModel request)
         {
-            var requestBytes = request.ToJson();
-            var content =  System.Text.Encoding.UTF8.GetString(requestBytes);
-            _client.Post(content);
+            var content = request.SerializeToJson();
+            //var content =  System.Text.Encoding.UTF8.GetString(requestBytes);
+            _client.Post( content);
              return Accepted();
         }
         
@@ -48,7 +44,7 @@ namespace Authorisations.Controllers
         [Route("requests/under-consideration")]
         [Route("requests/under-consideration/{requestType}")]
         [ProducesResponseType(typeof(Dictionary<string,string>),StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Dictionary<string,string>),StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Dictionary<string,string>),StatusCodes.Status400BadRequest)]
         public object RequestsUnderConsideration(string requestType)
         {
             string underConsideration;
@@ -56,7 +52,7 @@ namespace Authorisations.Controllers
             {
                 if (!RequestChecker.IsKnownRequestType(requestType))
                 {
-                    return NotFound();
+                    return BadRequest();
                 }
                 underConsideration  = $"{requestType}-UnderConsideration";
             }

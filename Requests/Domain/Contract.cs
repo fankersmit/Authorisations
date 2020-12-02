@@ -4,7 +4,7 @@ using System.Net.Mail;
 
 namespace Requests.Domain
 {
-    public class Contract : IContractModel
+    public class Contract 
     {
         public Guid ContractID  { get; private set; }
         public Organisation Organisation { get; private set; }

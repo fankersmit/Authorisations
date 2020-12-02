@@ -79,7 +79,6 @@ namespace Authorisations.Infrastructure
             props.ReplyTo = replyQueueName;
             return props;
         }           
-
         public string Call(string message )
         {
             var messageBytes = Encoding.UTF8.GetBytes(message);
@@ -97,13 +96,13 @@ namespace Authorisations.Infrastructure
             return _respQueue.Take();
         }
         
-        public void Post( string message )
+        public void Post( byte[] message )
         {
-           var body = Encoding.UTF8.GetBytes(message);
+           //var body = Encoding.UTF8.GetBytes(message);
            
            _channels[_publishQueueName].BasicPublish(
                 exchange: "", routingKey: _publishQueueName, 
-                basicProperties: null, body: body);
+                basicProperties: null, body: message);
         }
         
         public void Register()
