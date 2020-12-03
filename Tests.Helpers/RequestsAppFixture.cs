@@ -6,9 +6,9 @@ namespace Tests.Helpers
 {
     public class RequestsAppFixture : IDisposable
     {
-        private Process _process = null;
+        private readonly Process _process = null;
         
-        public RequestsAppFixture(   )
+        public RequestsAppFixture()
         {
             var processName = "RequestsApp";
             var applicationPath = @"C:\Projects\Authorisations\RequestsApp";

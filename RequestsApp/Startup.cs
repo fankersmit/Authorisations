@@ -11,7 +11,6 @@ namespace RequestsApp
 {
     public class Startup
     {
-
         private readonly IConfiguration  _configuration;
         private readonly IServiceProvider  _provider;
         

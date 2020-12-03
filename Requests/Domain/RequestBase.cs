@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace Requests.Domain
 {
-    public abstract class RequestBase : IRequest
+    public abstract class RequestBase : IRequest 
     {
         // properties
         public Guid Id { get; protected set; }
@@ -39,6 +39,7 @@ namespace Requests.Domain
             if( !IsInValidState(ValidTransitions.Submit)) return; 
             UpdateStatus(RequestStatus.Submitted);
         }
+        
         public virtual void Confirm()
         {
             if( !IsInValidState(ValidTransitions.Confirm)) return; 

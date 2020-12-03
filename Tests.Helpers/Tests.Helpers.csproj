@@ -6,7 +6,12 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Authorisations\Authorisations.csproj" />
+      <ProjectReference Include="..\RequestsApp\RequestsApp.csproj" />
       <ProjectReference Include="..\Requests\Requests.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
     </ItemGroup>
 
 </Project>
