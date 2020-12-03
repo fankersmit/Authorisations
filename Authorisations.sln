@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Controllers", "Tests.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestsApp", "RequestsApp\RequestsApp.csproj", "{9C8ABB7D-C145-4E44-8671-4644B6F9851B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.RequestApp", "Test.RequestApp\Test.RequestApp.csproj", "{FE0E15D6-E119-4C68-BA29-57AC0E154CDC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.RequestApp", "Tests.RequestApp\Tests.RequestApp.csproj", "{FE0E15D6-E119-4C68-BA29-57AC0E154CDC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Requests", "Requests\Requests.csproj", "{0B9FFFCF-9728-4E3D-ADED-381B3CB92AA5}"
 EndProject

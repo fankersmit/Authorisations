@@ -12,16 +12,19 @@ using Tests.Helpers;
 namespace Tests.Controllers
 {
     [Collection("Integration Tests")]
-    public class AuthorisationsControllerTests
+    public class AuthorisationsControllerTests  :IClassFixture<RequestsAppFixture>
     {
         private readonly DomainTypesFactory _requestFactory;
         private readonly HttpClient _client;
         private readonly string _root = "api/authorisations";
+        private RequestsAppFixture _fixture;
 
-        public AuthorisationsControllerTests(WebApplicationFactory<Startup> factory)
+        public AuthorisationsControllerTests( RequestsAppFixture fixture, WebApplicationFactory<Startup> factory)
         {
             _client = factory.CreateClient();
             _requestFactory = DomainTypesFactory.Instance;
+            // start requestApp if needed
+            _fixture = fixture;
         }
 
         [Theory]

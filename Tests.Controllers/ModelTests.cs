@@ -18,8 +18,7 @@ namespace Tests.Controllers
             var json = model.SerializeToJson();
             var model2 = json.DeSerializeFromJson<PersonModel>();
             // assert
-            Assert.Equal(model.FirstName, model2.FirstName);
-            Assert.Equal(model.LastName, model2.LastName);
+            model2.Should().BeEquivalentTo(model);
         }
 
         [Fact]

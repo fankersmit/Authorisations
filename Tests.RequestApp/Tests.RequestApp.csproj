@@ -4,6 +4,8 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
 
         <IsPackable>false</IsPackable>
+
+        <RootNamespace>Test.RequestApp</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,6 +19,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\RequestsApp\RequestsApp.csproj" />
+      <ProjectReference Include="..\Tests.Helpers\Tests.Helpers.csproj" />
     </ItemGroup>
 
 </Project>

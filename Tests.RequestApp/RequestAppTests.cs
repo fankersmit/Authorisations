@@ -1,12 +1,10 @@
 using Xunit;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using RequestsApp.Infrastructure;
 using RequestsApp.Domain;
+using Tests.Helpers;
 
-namespace Test.RequestApp
+namespace Tests.RequestApp
 {
     public class RequestAppTests
     {
@@ -42,6 +40,17 @@ namespace Test.RequestApp
             // Assert
             Assert.NotNull(handler);
             Assert.Equal(requestHandler, handler);
+        }
+
+        [Theory]
+        [InlineData("RequestsApp", true)]
+        [InlineData("GreatExpectations", false)]
+        public void CanDetermineIfProcessIsRunning(string  processName, bool expected)
+        {
+            // arrange, act
+            var actual = ProcessChecker.IsRunning(processName);
+            // assert
+            Assert.Equal(expected, actual);
         }
     }
 }
