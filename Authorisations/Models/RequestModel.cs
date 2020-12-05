@@ -1,10 +1,9 @@
 using System;
-using System.Reflection.PortableExecutable;
-using Requests.Domain;
+using Requests.Shared.Domain;
 
 namespace Authorisations.Models
 {
-    public class RequestModel
+    public class RequestModel : ICommand
     {
         public Guid Id { get; set; }
         public DateTime DateCreated { get; set; }
@@ -13,5 +12,6 @@ namespace Authorisations.Models
         public string Remarks { get; set; }
         public ContractModel Contract { get; set; }
         public PersonModel Applicant { get; set; }
+        public Commands Command { get; set; }
     }
 }

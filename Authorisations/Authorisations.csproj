@@ -52,7 +52,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Requests\Requests.csproj" />
+      <ProjectReference Include="..\Requests.Shared\Requests.Shared.csproj" />
     </ItemGroup>
 
 

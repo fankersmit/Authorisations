@@ -5,27 +5,34 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Requests.Domain;
+using Requests.Shared.Domain;
 using RequestsApp.Domain;
 
 namespace RequestsApp.Infrastructure
 {
     public class RabbitMQServer
     {
-        private readonly AuthorisationRequestsHandler _requestHandler;
+        private readonly ICommandHandler _commandHandler;
         private readonly ILogger _logger;
         private const string HostName = "localhost";
         private const string RequestsInfo_QueueName = "rpc_queue";
         private const string RequestHandling_QueueName = "publish_queue";
         private IList<EventingBasicConsumer> _consumers;
+        private readonly Random _random; 
+        
         
         // properties
-        public AuthorisationRequestsHandler RequestHandler => _requestHandler;
+        public ICommandHandler CommandHandler => _commandHandler;
 
         // ctors
-        public RabbitMQServer( ILogger<RabbitMQServer> logger, AuthorisationRequestsHandler requestHandler)
+        public RabbitMQServer( ILogger<RabbitMQServer> logger, ICommandHandler commandHandler)
         {
             _logger = logger;
-            _requestHandler = requestHandler;
+            _commandHandler = commandHandler;
+            
+            // phony return value creation, remove after implementing Query handling 
+            _random = new Random( DateTime.Now.Minute);          
         }
 
         public  void Run()
@@ -62,9 +69,15 @@ namespace RequestsApp.Infrastructure
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                _logger.LogInformation($"Received message {message} at {DateTime.UtcNow}");
+
+                // retrieve request and command from queue
+                var request = body.DeSerializeFromJson<AccountRequest>();
+                var command = body.DeSerializeFromJson<Commands>();
                 // handle message
-                _requestHandler.ProcessMessage(message);
+                _commandHandler.Handle(request, command);
+                //_requestHandler.ProcessMessage(message);
+                _logger.LogInformation($"handled {command.ToString()} command for reuqest with ID {request.Id} at {DateTime.UtcNow}");
+                
             };
             channel.BasicConsume(queue: requestHandlingQueueName,
                 autoAck: true,
@@ -95,7 +108,8 @@ namespace RequestsApp.Infrastructure
                 {
                     var message = Encoding.UTF8.GetString(body);
                     _logger.LogInformation($"Received message {message} at {DateTime.UtcNow}" );
-                    response = RequestHandler.ResponseFor(message);
+                    response =  $"{message}:{_random.Next(0,40000)}";
+                    //response = CommandHandler.ResponseFor(message);
                 }
                 catch (Exception e)
                 {

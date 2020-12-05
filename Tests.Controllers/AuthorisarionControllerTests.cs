@@ -96,6 +96,7 @@ namespace Tests.Controllers
 
         // -------------------------------------------------------------
         // private helper methods and classes
+        //
         private async Task<T> DeserializeJson<T>(HttpContent content)
         {
             T responseObject = JsonSerializer.Deserialize<T>(

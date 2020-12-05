@@ -1,21 +1,23 @@
+using Requests.Shared.Domain;
+
 namespace Requests.Domain
 {
     public interface IRequest
     {
         // Submit()
-        void Submit();
+        bool Submit();
         // Confirm
-        void Confirm();
+        bool Confirm();
         // Cancel
-        void Cancel();
+        bool Cancel();
         // Approve
-        void  Approve();
+        bool  Approve();
         // Disapprove
-        void Disapprove();
+        bool Disapprove();
         // Conclude, 
-        void Conclude();
+        bool Conclude();
         // Remove
-        void Remove();
+        bool Remove();
          // Status   
          RequestStatus Status { get; }
     }

@@ -1,6 +1,4 @@
-using System;
-
-namespace Requests.Domain
+namespace Requests.Shared.Domain
 {
     public enum RequestStatus : uint
     {

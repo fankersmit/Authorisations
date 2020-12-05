@@ -1,7 +1,9 @@
 using Xunit;
 using Authorisations.Models;
+using Requests.Shared.Domain;
 using Tests.Helpers;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Tests.Controllers
 {
@@ -69,5 +71,19 @@ namespace Tests.Controllers
             // assert
             model2.Should().BeEquivalentTo(model);
         }
+
+        [Fact]
+        public void CanDeserialize_Command_FromRequestModel()
+        {
+            // arrange
+            var model = _factory.CreateRequest();
+            var command = model.Command;
+            // act
+            var json = model.SerializeToJson<RequestModel>();
+            var model2 = json.DeSerializeFromJson<RequestModel>();
+            // assert
+            model2.Command.Should().BeEquivalentTo(model.Command);           
+        }
+        
     }
 }

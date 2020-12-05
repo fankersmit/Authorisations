@@ -1,13 +1,11 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using Requests.Domain;
+using Requests.Shared.Domain;
 using Xunit;
 
 namespace Tests.Requests
 {
-    delegate void RequestTransition();
+    delegate bool RequestTransition();
 
     public class RequestBaseTests
     {

@@ -1,14 +1,12 @@
-using System.Data.Common;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using Xunit;
-using Microsoft.Extensions.Logging;
-using RequestsApp.Infrastructure;
-using RequestsApp.Domain;
-using Tests.Helpers;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Requests.Domain;
+using RequestsApp.Domain;
+using RequestsApp.Infrastructure;
+using Tests.Helpers;
+using Xunit;
 
-namespace Tests.RequestApp 
+namespace Test.RequestApp 
 {
     public class RequestAppTests : IClassFixture<SqliteInMemoryFixture>
     {
@@ -35,14 +33,14 @@ namespace Tests.RequestApp
             // Act
             var rabbitMQServer = new RabbitMQServer(logger, requestHandler);
             rabbitMQServer.Run();
-            var handler = rabbitMQServer.RequestHandler; 
+            var handler = rabbitMQServer.CommandHandler; 
             // Assert
             Assert.NotNull(handler);
             Assert.Equal(requestHandler, handler);
         }
        
         [Theory]
-        [InlineData("RequestsApp", true)]
+        [InlineData("rider64", true)]    // works only if tests are run from within IDE
         [InlineData("GreatExpectations", false)]
         public void CanDetermineIfProcessIsRunning(string  processName, bool expected)
         {

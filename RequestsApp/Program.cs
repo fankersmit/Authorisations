@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Requests.Domain;
 using RequestsApp.Domain;
 using RequestsApp.Infrastructure;
 
@@ -17,8 +18,7 @@ namespace RequestsApp
             // create the database
             var  requestContext = startup.Provider.GetService<RequestDbContext>();
             requestContext.Database.EnsureCreated();
-            
-            var requestHandler = new AuthorisationRequestsHandler();
+
             var service = startup.Provider.GetService<RabbitMQServer>();
             service.Run();
 

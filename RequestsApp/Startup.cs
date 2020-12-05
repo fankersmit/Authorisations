@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RequestsApp.Domain;
+using Requests.Domain;
 using RequestsApp.Infrastructure;
 
 namespace RequestsApp
@@ -36,7 +37,7 @@ namespace RequestsApp
             
             services.AddLogging(configure => configure.AddConsole())
                 .AddTransient<RabbitMQServer>()
-                .AddTransient<AuthorisationRequestsHandler>()
+                .AddTransient<CommandHandler>()
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<RequestDbContext>(
        (serviceProvider, options) =>

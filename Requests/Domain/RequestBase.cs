@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Text.Json;
+using Requests.Shared.Domain;
 
 namespace Requests.Domain
 {
-    public abstract class RequestBase : IRequest 
+    public abstract class RequestBase : IRequest
     {
         // properties
         public Guid Id { get; protected set; }
@@ -34,46 +35,53 @@ namespace Requests.Domain
             return JsonSerializer.SerializeToUtf8Bytes(this, options);   
         }
 
-        public virtual void Submit()
+        public virtual bool Submit()
         {
-            if( !IsInValidState(ValidTransitions.Submit)) return; 
+            if( !IsInValidState(ValidTransitions.Submit)) return false; 
             UpdateStatus(RequestStatus.Submitted);
+            return true;
         }
         
-        public virtual void Confirm()
+        public virtual bool Confirm()
         {
-            if( !IsInValidState(ValidTransitions.Confirm)) return; 
-            UpdateStatus(RequestStatus.Confirmed);             
+            if( !IsInValidState(ValidTransitions.Confirm)) return false; 
+            UpdateStatus(RequestStatus.Confirmed);
+            return true;
         }
 
-        public virtual void Cancel()
+        public virtual bool Cancel()
         {
-            if( !IsInValidState(ValidTransitions.Cancel)) return;             
-            UpdateStatus(RequestStatus.Cancelled);        
+            if( !IsInValidState(ValidTransitions.Cancel)) return false;             
+            UpdateStatus(RequestStatus.Cancelled);
+            return true;
         }
 
-        public virtual void Approve()
+        public virtual bool Approve()
         {
-            if( !IsInValidState(ValidTransitions.Approve)) return; 
+            if( !IsInValidState(ValidTransitions.Approve)) return false; 
             UpdateStatus(RequestStatus.Approved);
+            return true;
         }
 
-        public virtual void Disapprove()
+        public virtual bool Disapprove()
         {
-            if( !IsInValidState(ValidTransitions.Disapprove)) return; 
+            if( !IsInValidState(ValidTransitions.Disapprove)) return false; 
             UpdateStatus(RequestStatus.Disapproved);
+            return true;
         }
 
-        public virtual void Conclude()
+        public virtual bool Conclude()
         {
-            if( !IsInValidState(ValidTransitions.Conclude)) return; 
+            if( !IsInValidState(ValidTransitions.Conclude)) return false; 
             UpdateStatus(RequestStatus.Concluded);
+            return true;
         }
 
-        public virtual void Remove()
+        public virtual bool Remove()
         {
-            if( !IsInValidState(ValidTransitions.Remove)) return; 
+            if( !IsInValidState(ValidTransitions.Remove)) return false; 
             UpdateStatus(RequestStatus.Removed);
+            return true;
         }
         
         // private Helper methods

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Requests.Domain;
 using Tests.Helpers;
 
@@ -91,6 +90,7 @@ namespace Tests.CreateTestRequests
         // ---------------------------------------------------------
         // helper methods
         // ---------------------------------------------------------
+        //
         private static RequestBase CreateOrganisationRequest()
         {
             throw new NotImplementedException();

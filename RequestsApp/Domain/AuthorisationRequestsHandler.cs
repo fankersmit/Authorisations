@@ -1,8 +1,10 @@
 using  System;
+using Requests.Domain;
+using Requests.Shared.Domain;
 
 namespace RequestsApp.Domain
 {
-    public class AuthorisationRequestsHandler
+    public class AuthorisationRequestsHandler : ICommandHandler
     {
         private readonly Random _random; 
       
@@ -15,7 +17,7 @@ namespace RequestsApp.Domain
         
         public string ResponseFor(string message)
         {
-            return $"{message}:{_random.Next(0,40000)}";
+            return  $"{message}:{_random.Next(0,40000)}";    
         }
         
         public string ProcessMessage(string message)
@@ -23,5 +25,12 @@ namespace RequestsApp.Domain
             Console.WriteLine(message);
             return string.Empty;
         }
+
+        public bool Handle(RequestBase request, Commands command)
+        {
+            throw new NotImplementedException();
+        }
+
+        public event EventHandler<CommandHandledEventArgs> CommandHandled;
     }
 }

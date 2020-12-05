@@ -98,8 +98,6 @@ namespace Authorisations.Infrastructure
         
         public void Post( byte[] message )
         {
-           //var body = Encoding.UTF8.GetBytes(message);
-           
            _channels[_publishQueueName].BasicPublish(
                 exchange: "", routingKey: _publishQueueName, 
                 basicProperties: null, body: message);

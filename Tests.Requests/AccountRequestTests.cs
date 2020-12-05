@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using Xunit;
 using Requests.Domain;
+using Requests.Shared.Domain;
 using Tests.Helpers;
   
 namespace Tests.Requests
@@ -21,8 +22,8 @@ namespace Tests.Requests
             var contract = factory.CreateContract(org);
             var request = factory.CreateAccountRequest(applicant, contract);
             // assert
-            Assert.Equal(DateTime.Now.Date, request.DateCreated.Date);
-            Assert.Equal(DateTime.Now.Date, request.DateLastUpdated.Date);
+            Assert.Equal(DateTime.UtcNow.Date, request.DateCreated.Date);
+            Assert.Equal(DateTime.UtcNow.Date, request.DateLastUpdated.Date);
             Assert.Equal(RequestStatus.New, request.Status);
             Assert.NotEqual(Guid.Empty, request.Id);
             Assert.Equal(string.Empty, request.Remarks);
@@ -53,6 +54,12 @@ namespace Tests.Requests
             var result = JsonSerializer.Deserialize<AccountRequest>(jsonString);
             // Assert
             Assert.IsType<AccountRequest>(result);
+        }
+
+        [Fact]
+        public void CanDeserializeCommandFromRequest()
+        {
+            
         }
     }
 }

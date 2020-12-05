@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Authorisations.Infrastructure;
 using Authorisations.Models;
+using Requests.Shared.Domain;
 
 namespace Authorisations.Controllers
 {
@@ -29,8 +30,8 @@ namespace Authorisations.Controllers
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         public object SubmitRequest(string requestType, [FromBody] RequestModel request)
         {
+            request.Command = Commands.Submit;
             var content = request.SerializeToJson();
-            //var content =  System.Text.Encoding.UTF8.GetString(requestBytes);
             _client.Post( content);
              return Accepted();
         }

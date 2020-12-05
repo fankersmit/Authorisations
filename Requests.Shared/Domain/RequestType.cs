@@ -1,4 +1,4 @@
-namespace Authorisations.Models
+namespace Requests.Shared.Domain
 {
     public enum RequestType
     {

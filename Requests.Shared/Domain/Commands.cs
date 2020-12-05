@@ -1,8 +1,8 @@
-namespace Requests.Domain
+namespace Requests.Shared.Domain
 {
     public enum Commands
     {
-        invalid, 
+        NoOp, 
         Submit,
         Confirm,
         Cancel,
