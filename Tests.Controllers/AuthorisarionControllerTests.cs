@@ -7,24 +7,47 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 using Authorisations;
+using FluentAssertions;
 using Tests.Helpers;
 
 namespace Tests.Controllers
 {
-    [Collection("Integration Tests")]
-    public class AuthorisationsControllerTests  :IClassFixture<RequestsAppFixture>
+    public class AuthorisationsControllerTests : IClassFixture<RequestsAppFixture>, IClassFixture< WebApplicationFactory<Startup>> 
     {
+        // fields
         private readonly DomainTypesFactory _requestFactory;
         private readonly HttpClient _client;
         private readonly string _root = "api/authorisations";
         private RequestsAppFixture _fixture;
 
+        // ctors
         public AuthorisationsControllerTests( RequestsAppFixture fixture, WebApplicationFactory<Startup> factory)
         {
             _client = factory.CreateClient();
             _requestFactory = DomainTypesFactory.Instance;
             // start requestApp if needed
             _fixture = fixture;
+        }
+   
+       [Fact]
+       public async Task  After_Submit_UnderConsideration_HasChanged()
+        {
+            // arrange
+            var response =  await _client.GetAsync($"{_root}/requests/under-consideration/account");
+            var ruc = await DeserializeJson<RequestsUnderConsideration>(response.Content);
+            
+            var request = _requestFactory.CreateAccountRequest();
+            var body = Encoding.UTF8.GetString(request.ToJson()); 
+            var content = new StringContent( body, Encoding.UTF8, "application/json");
+ 
+            // act
+            await _client.PostAsync($"{_root}/request/submit/account", content);
+            // get new under_consideration count
+            response  =  await _client.GetAsync($"{_root}/requests/under-consideration/account");
+            var newRuc = await DeserializeJson<RequestsUnderConsideration>(response.Content);
+
+            // assert
+            newRuc.Count.Should().BeGreaterThan(ruc.Count); // one more items under consideration
         }
 
         [Theory]

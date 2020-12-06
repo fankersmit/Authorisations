@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
+using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -28,7 +29,7 @@ namespace Authorisations.Controllers
         [HttpPost]
         [Route("request/submit/account")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
-        public object SubmitRequest(string requestType, [FromBody] RequestModel request)
+        public object SubmitRequest( [FromBody] RequestModel request )
         {
             request.Command = Commands.Submit;
             var content = request.SerializeToJson();
@@ -51,18 +52,20 @@ namespace Authorisations.Controllers
             string underConsideration;
             if (requestType != null)
             {
-                if (!RequestChecker.IsKnownRequestType(requestType))
+                if (!RequestTypeChecker.IsKnownRequestType(requestType))
                 {
                     return BadRequest();
                 }
-                underConsideration  = $"{requestType}-UnderConsideration";
+                underConsideration  = $"UnderConsideration:{requestType}";
             }
             else
             {
-                underConsideration = "UnderConsideration";    
+                // get requests total  
+                underConsideration = "UnderConsideration:all";    
             }
             // put request on queue
-            var result = _client.Call(underConsideration);
+            var messageBytes = Encoding.UTF8.GetBytes(underConsideration);
+            var result = _client.Call(messageBytes);
             var split  = result.Split(':');
             var response  = new Dictionary<string,string> {{ split[0], split[1]}};
             return response;

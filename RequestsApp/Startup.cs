@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using RequestsApp.Domain;
 using Requests.Domain;
 using RequestsApp.Infrastructure;
 
@@ -37,7 +36,8 @@ namespace RequestsApp
             
             services.AddLogging(configure => configure.AddConsole())
                 .AddTransient<RabbitMQServer>()
-                .AddTransient<CommandHandler>()
+                .AddTransient<ICommandHandler, CommandHandler>()
+                .AddTransient<IQueryHandler, QueryHandler>()
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<RequestDbContext>(
        (serviceProvider, options) =>

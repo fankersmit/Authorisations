@@ -7,13 +7,19 @@ namespace Tests.Helpers
     public class RequestsAppFixture : IDisposable
     {
         private readonly Process _process = null;
+        private bool Started = false;
         
         public RequestsAppFixture()
         {
             var processName = "RequestsApp";
             var applicationPath = @"C:\Projects\Authorisations\RequestsApp";
 
-            if (!ProcessChecker.IsRunning(processName))
+            Process[] processes = Process.GetProcessesByName(processName);
+            if (processes.Length > 0)
+            {
+                _process = processes[0];
+            }
+            else
             {
                 _process = new Process
                 {
@@ -25,13 +31,17 @@ namespace Tests.Helpers
                         WorkingDirectory = applicationPath
                     }
                 };
-                _process.Start();
             }
+        }
+        
+        public void StartRequestsApp()
+        {
+            Started = _process.Start();
         }
 
         private void ReleaseUnmanagedResources()
         {
-            if (_process != null && !_process.HasExited)
+            if (Started && !_process.HasExited)
             {
                 _process.Kill(true);
             }

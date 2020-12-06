@@ -23,20 +23,21 @@ namespace Test.RequestApp
         }
 
         [Fact]
-        public void CanInjectRequestHandlerIntoBroker()
+        public void CanInjectRequestHandlersIntoBroker()
         {
             // Arrange
-            var requestHandler = new AuthorisationRequestsHandler();
+            ICommandHandler requestHandler = new AuthorisationRequestsHandler();
+            IQueryHandler queryHandler = new QueryHandler();
             using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
             var logger = loggerFactory.CreateLogger<RabbitMQServer>();
 
             // Act
-            var rabbitMQServer = new RabbitMQServer(logger, requestHandler);
+            var rabbitMQServer = new RabbitMQServer(logger, requestHandler,queryHandler );
             rabbitMQServer.Run();
-            var handler = rabbitMQServer.CommandHandler; 
+
             // Assert
-            Assert.NotNull(handler);
-            Assert.Equal(requestHandler, handler);
+            Assert.Equal(requestHandler,  rabbitMQServer.CommandHandler);
+            Assert.Equal(queryHandler, rabbitMQServer.QueryHandler);
         }
        
         [Theory]

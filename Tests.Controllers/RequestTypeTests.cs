@@ -36,7 +36,7 @@ namespace Tests.Controllers
         void CanCheckForExistingRequestType( string request, bool expected)
         {
             // arrange, act
-            var actual = RequestChecker.IsKnownRequestType(request);
+            var actual = RequestTypeChecker.IsKnownRequestType(request);
             // assert
             Assert.Equal(expected, actual);
 

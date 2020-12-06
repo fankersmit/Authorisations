@@ -78,11 +78,11 @@ namespace Authorisations.Infrastructure
             props.CorrelationId = Guid.NewGuid().ToString();
             props.ReplyTo = replyQueueName;
             return props;
-        }           
-        public string Call(string message )
+        }   
+        
+        public string Call(byte[]  messageBytes )
         {
-            var messageBytes = Encoding.UTF8.GetBytes(message);
-            _channels[ _rpcQueueName].BasicPublish(
+           _channels[ _rpcQueueName].BasicPublish(
                 "",
                 routingKey:  _rpcQueueName,
                 basicProperties: _props,

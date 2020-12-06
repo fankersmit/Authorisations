@@ -14,25 +14,23 @@ namespace RequestsApp.Infrastructure
     public class RabbitMQServer
     {
         private readonly ICommandHandler _commandHandler;
+        private readonly IQueryHandler _queryHandler;
         private readonly ILogger _logger;
         private const string HostName = "localhost";
         private const string RequestsInfo_QueueName = "rpc_queue";
         private const string RequestHandling_QueueName = "publish_queue";
         private IList<EventingBasicConsumer> _consumers;
-        private readonly Random _random; 
-        
         
         // properties
         public ICommandHandler CommandHandler => _commandHandler;
+        public IQueryHandler QueryHandler => _queryHandler;
 
         // ctors
-        public RabbitMQServer( ILogger<RabbitMQServer> logger, ICommandHandler commandHandler)
+        public RabbitMQServer( ILogger<RabbitMQServer> logger, ICommandHandler commandHandler, IQueryHandler  queryHandler)
         {
             _logger = logger;
             _commandHandler = commandHandler;
-            
-            // phony return value creation, remove after implementing Query handling 
-            _random = new Random( DateTime.Now.Minute);          
+            _queryHandler = queryHandler;
         }
 
         public  void Run()
@@ -47,14 +45,14 @@ namespace RequestsApp.Infrastructure
             var factory = new ConnectionFactory() {HostName = hostName};
             var connection = factory.CreateConnection();
            
-            consumers.Add(CreateRequestsInfoQueue( connection, RequestsInfo_QueueName ));
+            consumers.Add(CreateQueryRequestsQueue( connection, RequestsInfo_QueueName ));
             
             // create more queues as program evolves
-            consumers.Add(CreateRequestHandlingQueue( connection , RequestHandling_QueueName ));
+            consumers.Add(CreateHandleRequestQueue( connection , RequestHandling_QueueName ));
             return consumers;
         }
 
-        private EventingBasicConsumer CreateRequestHandlingQueue(IConnection connection, string requestHandlingQueueName)
+        private EventingBasicConsumer CreateHandleRequestQueue(IConnection connection, string requestHandlingQueueName)
         {
             var channel = connection.CreateModel();
 
@@ -68,15 +66,10 @@ namespace RequestsApp.Infrastructure
             consumer.Received += (model, ea) =>
             {
                 var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-
-                // retrieve request and command from queue
                 var request = body.DeSerializeFromJson<AccountRequest>();
                 var command = body.DeSerializeFromJson<Commands>();
-                // handle message
                 _commandHandler.Handle(request, command);
-                //_requestHandler.ProcessMessage(message);
-                _logger.LogInformation($"handled {command.ToString()} command for reuqest with ID {request.Id} at {DateTime.UtcNow}");
+                _logger.LogInformation($"handled {command.ToString()} command for request with ID {request.Id} at {DateTime.UtcNow}");
                 
             };
             channel.BasicConsume(queue: requestHandlingQueueName,
@@ -87,7 +80,7 @@ namespace RequestsApp.Infrastructure
             return consumer;
         }
 
-        private EventingBasicConsumer CreateRequestsInfoQueue(IConnection connection, string queueName)
+        private EventingBasicConsumer CreateQueryRequestsQueue(IConnection connection, string queueName)
         {
             var channel = connection.CreateModel();
             channel.QueueDeclare(queue: queueName, durable: false,
@@ -106,10 +99,9 @@ namespace RequestsApp.Infrastructure
 
                 try
                 {
+                    response = GetRequestsUnderConsideration(body).ToString();
                     var message = Encoding.UTF8.GetString(body);
                     _logger.LogInformation($"Received message {message} at {DateTime.UtcNow}" );
-                    response =  $"{message}:{_random.Next(0,40000)}";
-                    //response = CommandHandler.ResponseFor(message);
                 }
                 catch (Exception e)
                 {
@@ -135,5 +127,23 @@ namespace RequestsApp.Infrastructure
             _logger.LogInformation($"Created Request Info handling queue at {DateTime.UtcNow}");
             return consumer;
         }
+
+        int GetRequestsUnderConsideration(byte[] body)
+        {
+            int requestCount;
+            var message = Encoding.UTF8.GetString(body);
+            var requestType = message.Substring(message.IndexOf(':')+1);
+            if ( Enum.TryParse<RequestType>(requestType, true, out var rt))
+            {
+                 requestCount = _queryHandler.RequestsUnderConsideration( rt ); 
+            }
+            else
+            {
+                requestCount = _queryHandler.AllRequestsUnderConsideration();                      
+            }
+
+            return requestCount;
+        }
+        
     }
 }

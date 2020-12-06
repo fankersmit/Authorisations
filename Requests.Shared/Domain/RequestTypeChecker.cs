@@ -1,10 +1,9 @@
 using System;
 using System.Linq;
-using Requests.Shared.Domain;
 
-namespace Authorisations.Models
+namespace Requests.Shared.Domain
 {
-    public static class RequestChecker
+    public static class RequestTypeChecker
     {
         public static bool IsKnownRequestType(string description)
         {

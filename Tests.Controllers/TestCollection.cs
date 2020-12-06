@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 using Authorisations;
+using Tests.Helpers;
 
 namespace Tests.Controllers
 {
