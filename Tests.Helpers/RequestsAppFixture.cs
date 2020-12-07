@@ -6,41 +6,37 @@ namespace Tests.Helpers
 {
     public class RequestsAppFixture : IDisposable
     {
-        private readonly Process _process = null;
+        private static Process _process = null;
         private bool Started = false;
+        string _processName = "RequestsApp";
+        string _applicationPath = @"C:\Projects\Authorisations\RequestsApp";
         
         public RequestsAppFixture()
         {
-            var processName = "RequestsApp";
-            var applicationPath = @"C:\Projects\Authorisations\RequestsApp";
-
-            Process[] processes = Process.GetProcessesByName(processName);
-            if (processes.Length > 0)
-            {
-                _process = processes[0];
-            }
-            else
-            {
-                _process = new Process
-                {
-                    StartInfo =
-                    {
-                        FileName = "dotnet",
-                        Arguments = "run",
-                        UseShellExecute = false,
-                        WorkingDirectory = applicationPath
-                    }
-                };
-            }
+            Started = ProcessChecker.IsRunning(_processName);
         }
         
         public void StartRequestsApp()
         {
+            if (Started) return;
+            
+            _process = new Process
+            {
+                StartInfo =
+                {
+                    FileName = "dotnet",
+                    Arguments = "run",
+                    UseShellExecute = false,
+                    WorkingDirectory = _applicationPath
+                }
+            };
             Started = _process.Start();
         }
 
         private void ReleaseUnmanagedResources()
         {
+            if (_process == null) return;
+            
             if (Started && !_process.HasExited)
             {
                 _process.Kill(true);

@@ -27,6 +27,7 @@ namespace Tests.Controllers
             _requestFactory = DomainTypesFactory.Instance;
             // start requestApp if needed
             _fixture = fixture;
+            _fixture.StartRequestsApp();
         }
    
        [Fact]
@@ -40,7 +41,7 @@ namespace Tests.Controllers
             var body = Encoding.UTF8.GetString(request.ToJson()); 
             var content = new StringContent( body, Encoding.UTF8, "application/json");
  
-            // act
+            // act, submit request
             await _client.PostAsync($"{_root}/request/submit/account", content);
             // get new under_consideration count
             response  =  await _client.GetAsync($"{_root}/requests/under-consideration/account");
@@ -135,7 +136,7 @@ namespace Tests.Controllers
         
         private class RequestsUnderConsideration
         {
-            public string RequstType { get; set; }  
+            public string requestType { get; set; }  
             public int Count { get; set; }
         }
         

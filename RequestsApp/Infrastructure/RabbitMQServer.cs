@@ -7,7 +7,6 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Requests.Domain;
 using Requests.Shared.Domain;
-using RequestsApp.Domain;
 
 namespace RequestsApp.Infrastructure
 {
@@ -132,7 +131,7 @@ namespace RequestsApp.Infrastructure
         {
             int requestCount;
             var message = Encoding.UTF8.GetString(body);
-            var requestType = message.Substring(message.IndexOf(':')+1);
+            var requestType = message.Substring(message.IndexOf('-')+1);
             if ( Enum.TryParse<RequestType>(requestType, true, out var rt))
             {
                  requestCount = _queryHandler.RequestsUnderConsideration( rt ); 

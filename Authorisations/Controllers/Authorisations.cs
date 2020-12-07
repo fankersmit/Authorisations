@@ -34,7 +34,7 @@ namespace Authorisations.Controllers
             request.Command = Commands.Submit;
             var content = request.SerializeToJson();
             _client.Post( content);
-             return Accepted();
+            return Accepted();
         }
         
         /*
@@ -47,7 +47,7 @@ namespace Authorisations.Controllers
         [Route("requests/under-consideration/{requestType}")]
         [ProducesResponseType(typeof(Dictionary<string,string>),StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Dictionary<string,string>),StatusCodes.Status400BadRequest)]
-        public object RequestsUnderConsideration(string requestType)
+        public object RequestsUnderConsideration(string? requestType)
         {
             string underConsideration;
             if (requestType != null)
@@ -56,18 +56,17 @@ namespace Authorisations.Controllers
                 {
                     return BadRequest();
                 }
-                underConsideration  = $"UnderConsideration:{requestType}";
+                underConsideration  = $"UnderConsideration-{requestType}";
             }
             else
             {
                 // get requests total  
-                underConsideration = "UnderConsideration:all";    
+                underConsideration = "UnderConsideration-all";    
             }
             // put request on queue
             var messageBytes = Encoding.UTF8.GetBytes(underConsideration);
             var result = _client.Call(messageBytes);
-            var split  = result.Split(':');
-            var response  = new Dictionary<string,string> {{ split[0], split[1]}};
+            var response  = new Dictionary<string,string> {{ underConsideration, result}};
             return response;
         }
         

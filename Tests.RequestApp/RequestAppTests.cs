@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Requests.Domain;
-using RequestsApp.Domain;
 using RequestsApp.Infrastructure;
 using Tests.Helpers;
 using Xunit;
@@ -12,7 +11,6 @@ namespace Test.RequestApp
     {
         // properties
         public DomainTypesFactory Factory { get;  }
-
         public SqliteInMemoryFixture Fixture { get; }
         
         //ctors
@@ -26,7 +24,7 @@ namespace Test.RequestApp
         public void CanInjectRequestHandlersIntoBroker()
         {
             // Arrange
-            ICommandHandler requestHandler = new AuthorisationRequestsHandler();
+            ICommandHandler requestHandler = new CommandHandler();
             IQueryHandler queryHandler = new QueryHandler();
             using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
             var logger = loggerFactory.CreateLogger<RabbitMQServer>();

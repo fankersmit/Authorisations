@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Requests.Domain;
-using RequestsApp.Domain;
 using RequestsApp.Infrastructure;
 
 
