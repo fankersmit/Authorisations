@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Requests.Shared.Domain;
 
 namespace Requests.Domain
@@ -31,7 +32,14 @@ namespace Requests.Domain
         // methods
         public virtual byte[] ToJson()
         {
-            var options = new JsonSerializerOptions {WriteIndented = true};
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters =
+                {
+                    new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+                }
+            };
             return JsonSerializer.SerializeToUtf8Bytes(this, options);   
         }
 

@@ -1,6 +1,9 @@
+using System.Text.Json.Serialization;
+
 namespace Requests.Shared.Domain
 {
-    public enum RequestStatus : uint
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum RequestStatus 
     {
         New = 128,             // 10000000
         Submitted = 64,        // 01000000

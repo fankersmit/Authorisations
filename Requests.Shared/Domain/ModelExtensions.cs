@@ -7,7 +7,7 @@ namespace Requests.Shared.Domain
 {
     public static class ModelExtensions
     {
-        public static byte[] SerializeToJson(this object model)
+        public static byte[] SerializeToJson<TRequest>(this TRequest model)
         {
             var options = new JsonSerializerOptions
             {
@@ -16,14 +16,7 @@ namespace Requests.Shared.Domain
                 {
                     new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
                 }
-                
             };
-            return JsonSerializer.SerializeToUtf8Bytes(model, options);
-        }
-        
-        public static byte[] SerializeToJson<TRequest>(this TRequest model)
-        {
-            var options = new JsonSerializerOptions {WriteIndented = true};
             return JsonSerializer.SerializeToUtf8Bytes<TRequest>( model, options);
         }
         

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -27,7 +28,9 @@ namespace Requests.Domain
              var  fullPath = Path.Combine(directoryPath,$"{Id}.json");
              // note the using declaration
              using StreamWriter outputFile = new StreamWriter(fullPath);
-             outputFile.WriteLine(ToJson());
+             outputFile.WriteLine(Encoding.UTF8.GetString(ToJson() ));
+             outputFile.Flush();
+             outputFile.Close();
          }
     }
 }
