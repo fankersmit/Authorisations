@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
@@ -10,6 +11,8 @@ namespace Authorisations.Infrastructure
 {
     public class RabbitMqClient : IRabbitMqClient
     {
+        // client fields
+        private readonly ILogger<RabbitMqClient> _logger;
         // rabbitmmq  fields
         private readonly IConnection _connection;
         private readonly ConnectionFactory _connectionFactory;
@@ -24,8 +27,9 @@ namespace Authorisations.Infrastructure
         // publish channel
         private const string _publishQueueName = "publish_queue";
         
-        public RabbitMqClient()
+        public RabbitMqClient( ILogger<RabbitMqClient> logger )
         {
+            _logger = logger;
             // we use a different channel for rpc and publish command: submit,confirm, etc,..
             _channels = new Dictionary<string, IModel>();
             _connectionFactory = new ConnectionFactory() { HostName = "localhost" };
@@ -101,6 +105,7 @@ namespace Authorisations.Infrastructure
            _channels[_publishQueueName].BasicPublish(
                 exchange: "", routingKey: _publishQueueName, 
                 basicProperties: null, body: message);
+           _logger.LogInformation(System.Text.Encoding.Default.GetString(message));
         }
         
         public void Register()

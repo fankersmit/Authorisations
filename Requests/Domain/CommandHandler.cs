@@ -19,8 +19,12 @@ namespace Requests.Domain
             {
                 case Commands.Submit:
                     retval = request.Submit();
-                    // inform interested parties
-                    RaiseCommandHandledEvent( request, command);
+
+                    if (retval == true)
+                    {
+                        // inform interested parties like database                        
+                        RaiseCommandHandledEvent( request, command);
+                    }
                     break;
 
                 default:

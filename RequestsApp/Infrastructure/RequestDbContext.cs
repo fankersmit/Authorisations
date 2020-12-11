@@ -14,26 +14,32 @@ namespace RequestsApp.Infrastructure
 
         // repo
         public DbSet<AccountRequest> AccountRequests { get; set; }
-
+        public DbSet<Contract> Contracts { get; set; }
+        public DbSet<Person> Persons { get; set; }
+        public DbSet<Product> Products{ get; set; }
+        public DbSet<Product> Organisation{ get; set; }
+        
+        
         // methods
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Organisation>().HasKey(x => x.Id);
-            modelBuilder.Entity<Contract>().HasKey(x => x.ContractID);
-            modelBuilder.Entity<AccountRequest>().HasKey(x => x.Id);
-            modelBuilder.Entity<Product>().HasKey(x => x.ProductId);
-            modelBuilder.Entity<Person>().HasKey(x => x.PersonId);
+            modelBuilder.Entity<AccountRequest>().HasKey(x => x.ID);
+            modelBuilder.Entity<Organisation>().HasKey(x => x.ID);
+            modelBuilder.Entity<Contract>().HasKey(x => x.ID);
+            modelBuilder.Entity<Product>().HasKey(x => x.ID);
+            modelBuilder.Entity<Person>().HasKey(x => x.ID);
             base.OnModelCreating(modelBuilder);
         }
 
-        public void CommandExecuted(object sender, CommandHandledEventArgs eventArgs)
+        public void OnCommandExecuted(object sender, CommandHandledEventArgs eventArgs)
         {
+            var entity = eventArgs.Request as AccountRequest;
+            
             switch (eventArgs.CommandHandled)
             {
                 case Commands.Submit:
-                    var entity = eventArgs.Request;
-                    AccountRequests.Add(entity as AccountRequest);
-                    SaveChanges();
+                    this.AccountRequests.Add(entity) ;
+                    this.SaveChanges();
                     break;
                 
                 default:

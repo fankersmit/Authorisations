@@ -8,7 +8,7 @@ namespace Requests.Domain
     public abstract class RequestBase : IRequest
     {
         // properties
-        public Guid Id { get; protected set; }
+        public Guid ID { get; protected set; }
         public DateTime DateCreated { get; protected set; }
         public DateTime DateLastUpdated { get; protected set; }
         public RequestStatus Status { get; protected set; }
@@ -16,14 +16,14 @@ namespace Requests.Domain
 
         // requester properties
         public Person Applicant { get; protected set; }
-
+        
         // contract
         public Contract Contract { get; protected set; }
-
+        
         // constructors
         protected RequestBase()
         {
-            Id = Guid.NewGuid();
+            ID = Guid.NewGuid();
             DateCreated = DateLastUpdated = DateTime.UtcNow;
             Status = RequestStatus.New;
             Remarks = string.Empty;

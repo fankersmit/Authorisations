@@ -52,7 +52,7 @@ namespace Tests.Requests
 
             // assert
             actual.Should().BeTrue();
-            subscriber.Request.Id.Equals(request.Id);
+            subscriber.Request.ID.Equals(request.ID);
             subscriber.Request.Status.Should().Be(RequestStatus.Submitted);
         }
 
@@ -62,13 +62,13 @@ namespace Tests.Requests
             // arrange
             var request = Factory.CreateAccountRequest();
             var copy = CreateDeepCopy(request);
-            var requestId = request.Id;
+            var requestId = request.ID;
             var dbContext = Fixture.Context;
             var handler = new CommandHandler();
             
             // act
             var previousCount = dbContext.AccountRequests.Count(); 
-            handler.CommandHandled += dbContext.CommandExecuted;   //suscribe to command
+            handler.CommandHandled += dbContext.OnCommandExecuted;   //suscribe to command
             handler.Handle(request, Commands.Submit);
             var actual = dbContext.AccountRequests.Find(requestId);
             

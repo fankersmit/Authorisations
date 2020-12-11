@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -6,8 +5,11 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
+
 using Authorisations;
+using Requests.Shared;
 using FluentAssertions;
+using Requests.Domain;
 using Tests.Helpers;
 
 namespace Tests.Controllers
@@ -31,21 +33,21 @@ namespace Tests.Controllers
         }
    
        [Fact]
-       public async Task  After_Submit_UnderConsideration_HasChanged()
+       public void After_Submit_UnderConsideration_HasChanged()
         {
             // arrange
-            var response =  await _client.GetAsync($"{_root}/requests/under-consideration/account");
-            var ruc = await DeserializeJson<RequestsUnderConsideration>(response.Content);
+            var response = _client.GetAsync($"{_root}/requests/under-consideration/account").Result;
+            var ruc = DeserializeJson<RequestsUnderConsideration>(response.Content).Result;
             
             var request = _requestFactory.CreateAccountRequest();
             var body = Encoding.UTF8.GetString(request.ToJson()); 
             var content = new StringContent( body, Encoding.UTF8, "application/json");
  
             // act, submit request
-            await _client.PostAsync($"{_root}/request/submit/account", content);
+            var result =  _client.PostAsync($"{_root}/request/submit/account", content).Result;
             // get new under_consideration count
-            response  =  await _client.GetAsync($"{_root}/requests/under-consideration/account");
-            var newRuc = await DeserializeJson<RequestsUnderConsideration>(response.Content);
+            response = _client.GetAsync($"{_root}/requests/under-consideration/account").Result;
+            var newRuc = DeserializeJson<RequestsUnderConsideration>(response.Content).Result;
 
             // assert
             newRuc.Count.Should().BeGreaterThan(ruc.Count); // one more items under consideration
@@ -123,7 +125,7 @@ namespace Tests.Controllers
         //
         private async Task<T> DeserializeJson<T>(HttpContent content)
         {
-            T responseObject = JsonSerializer.Deserialize<T>(
+            var responseObject = JsonSerializer.Deserialize<T>(
                 await content.ReadAsStringAsync(),
                 new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
             return responseObject;

@@ -5,7 +5,7 @@ namespace Authorisations.Models
 {
     public class RequestModel : ICommand
     {
-        public Guid Id { get; set; }
+        public Guid ID { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateLastUpdated { get; set; }
         public RequestStatus  Status { get; set; }

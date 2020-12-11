@@ -23,7 +23,7 @@ namespace Tests.CreateTestRequests
                 AccountRequest ar = request as AccountRequest;
                 var path =  @"C:\Projects\Authorisations\Documentation";
                 ar.SaveTo(path);
-                Console.WriteLine(request.Id);
+                Console.WriteLine(request.ID);
             }
 
             Console.WriteLine(

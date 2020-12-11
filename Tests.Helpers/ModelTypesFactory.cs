@@ -74,7 +74,7 @@ namespace Tests.Helpers
             var org = Orgs[idx];
             return  new OrganisationModel() 
                 {  
-                    OrganisationId = org.ID,
+                    ID = org.ID,
                     Name =  org.Name, 
                     Description  = org.Description 
                 };
@@ -84,7 +84,7 @@ namespace Tests.Helpers
         {
             return  new OrganisationModel() 
             {  
-                OrganisationId = org.ID,
+                ID = org.ID,
                 Name =  org.Name, 
                 Description  = org.Description 
             };

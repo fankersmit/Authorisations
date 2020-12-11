@@ -4,6 +4,7 @@ using System.ComponentModel.Design;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Requests.Domain;
 using Requests.Shared.Domain;
@@ -12,13 +13,16 @@ namespace RequestsApp.Infrastructure
 {
     public class RabbitMQServer
     {
-        private readonly ICommandHandler _commandHandler;
-        private readonly IQueryHandler _queryHandler;
-        private readonly ILogger _logger;
         private const string HostName = "localhost";
         private const string RequestsInfo_QueueName = "rpc_queue";
         private const string RequestHandling_QueueName = "publish_queue";
-        private IList<EventingBasicConsumer> _consumers;
+        
+        private readonly ICommandHandler _commandHandler;
+        private readonly IQueryHandler _queryHandler;
+        private readonly ILogger _logger;
+        private readonly IConnection _connection;
+        private readonly ConnectionFactory _connectionFactory;
+        private readonly Dictionary<string, IModel> _channels;
         
         // properties
         public ICommandHandler CommandHandler => _commandHandler;
@@ -30,63 +34,71 @@ namespace RequestsApp.Infrastructure
             _logger = logger;
             _commandHandler = commandHandler;
             _queryHandler = queryHandler;
+            _channels = new Dictionary<string, IModel>();
+            _connectionFactory = new ConnectionFactory() { HostName = "localhost" };
+            _connection = _connectionFactory.CreateConnection();
         }
 
-        public  void Run()
+        public void Run( RequestDbContext context )
         {
-            _consumers = CreateServer(HostName); 
+            // wire up event handling
+            _commandHandler.CommandHandled += context.OnCommandExecuted;
+            
+            CreateChannels(); 
             _logger.LogInformation("Started Server at {dateTime}", DateTime.UtcNow);
         }
         
-        private IList<EventingBasicConsumer> CreateServer(string hostName)
+        
+        public void Stop()
         {
-            var consumers = new List<EventingBasicConsumer>();
-            var factory = new ConnectionFactory() {HostName = hostName};
-            var connection = factory.CreateConnection();
-           
-            consumers.Add(CreateQueryRequestsQueue( connection, RequestsInfo_QueueName ));
-            
-            // create more queues as program evolves
-            consumers.Add(CreateHandleRequestQueue( connection , RequestHandling_QueueName ));
-            return consumers;
+            foreach( KeyValuePair<string, IModel> entry in  _channels)
+            {
+                var channel = entry.Value;
+                if ( channel.IsOpen ) channel.Close(); 
+            }
+            _connection.Close();
+            _logger.LogInformation("Stopped Server at {dateTime}", DateTime.UtcNow);
         }
 
-        private EventingBasicConsumer CreateHandleRequestQueue(IConnection connection, string requestHandlingQueueName)
+        private void  CreateChannels()
+        {
+            CreateChannelHandlingCommands( _connection , RequestHandling_QueueName );
+            _logger.LogInformation($"Created Request handling queue at {DateTime.UtcNow}");
+            CreateChannelHandlingQueries( _connection, RequestsInfo_QueueName );
+            _logger.LogInformation($"Created Request Info handling queue at {DateTime.UtcNow}");
+            // create more channels as program evolves
+        }
+
+        private void CreateChannelHandlingCommands(IConnection connection, string commandHandlingQueueName)
         {
             var channel = connection.CreateModel();
-
-            channel.QueueDeclare(queue: requestHandlingQueueName,
+            channel.QueueDeclare(queue: commandHandlingQueueName,
                 durable: false,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
 
             var consumer = new EventingBasicConsumer(channel);
-            consumer.Received += (model, ea) =>
+            consumer.Received += OnConsumerOnReceived;
+            channel.CallbackException += (chann, args) =>
             {
-                var body = ea.Body.ToArray();
-                var request = body.DeSerializeFromJson<AccountRequest>();
-                var command = body.DeSerializeFromJson<Commands>();
-                _commandHandler.Handle(request, command);
-                _logger.LogInformation($"handled {command.ToString()} command for request with ID {request.Id} at {DateTime.UtcNow}");
-                
+                _logger.LogError(args.Exception, args.Exception.Message);
             };
-            channel.BasicConsume(queue: requestHandlingQueueName,
+            channel.BasicConsume(queue: commandHandlingQueueName,
                 autoAck: true,
                 consumer: consumer);
 
-            _logger.LogInformation($"Created Request handling queue at {DateTime.UtcNow}");
-            return consumer;
+            _channels.Add(commandHandlingQueueName, channel);
         }
 
-        private EventingBasicConsumer CreateQueryRequestsQueue(IConnection connection, string queueName)
+        private void CreateChannelHandlingQueries(IConnection connection, string queryHandlingQueueName)
         {
             var channel = connection.CreateModel();
-            channel.QueueDeclare(queue: queueName, durable: false,
+            channel.QueueDeclare(queue: queryHandlingQueueName, durable: false,
                 exclusive: false, autoDelete: false, arguments: null);
             channel.BasicQos(0, 1, false);
             var consumer = new EventingBasicConsumer(channel);
-            channel.BasicConsume(queue:queueName, autoAck: false, consumer: consumer);
+            channel.BasicConsume(queue:queryHandlingQueueName, autoAck: false, consumer: consumer);
 
             consumer.Received += (model, ea) =>
             {
@@ -100,11 +112,11 @@ namespace RequestsApp.Infrastructure
                 {
                     response = GetRequestsUnderConsideration(body).ToString();
                     var message = Encoding.UTF8.GetString(body);
-                    _logger.LogInformation($"Received message {message} at {DateTime.UtcNow}" );
+                    _logger.LogInformation($"Received message {message} at {DateTime.UtcNow}");
                 }
                 catch (Exception e)
                 {
-                    if( e is  ArgumentNullException || e is ArgumentException )
+                    if (e is ArgumentNullException || e is ArgumentException)
                     {
                         response = "";
                     }
@@ -121,13 +133,22 @@ namespace RequestsApp.Infrastructure
                     channel.BasicAck(deliveryTag: ea.DeliveryTag,
                         multiple: false);
                 }
+                _channels.Add(queryHandlingQueueName, channel);
             };
-            
-            _logger.LogInformation($"Created Request Info handling queue at {DateTime.UtcNow}");
-            return consumer;
-        }
 
-        int GetRequestsUnderConsideration(byte[] body)
+        }
+#nullable enable
+        private void OnConsumerOnReceived(object? model, BasicDeliverEventArgs ea)
+        {
+            var body = ea.Body.ToArray();
+            var request = body.DeSerializeFromJson<AccountRequest>();
+            var command = body.DeSerializeFromJson<Commands>("Command");
+            _commandHandler.Handle(request, command);
+            _logger.LogInformation($"handled {command.ToString()} command for request with ID {request.ID} at {DateTime.UtcNow}");
+        }
+#nullable disable
+        
+        private int GetRequestsUnderConsideration(byte[] body)
         {
             int requestCount;
             var message = Encoding.UTF8.GetString(body);
@@ -140,7 +161,7 @@ namespace RequestsApp.Infrastructure
             {
                 requestCount = _queryHandler.AllRequestsUnderConsideration();                      
             }
-
+            _logger.LogInformation($"handled {requestType} query at {DateTime.UtcNow}");
             return requestCount;
         }
         

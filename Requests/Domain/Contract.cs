@@ -6,16 +6,18 @@ namespace Requests.Domain
 {
     public class Contract 
     {
-        public Guid ContractID  { get; private set; }
+        public Guid ID  { get; private set; }
+        
         public Organisation Organisation { get; private set; }
         public string AuthorizerMailAddress { get; private set; }
+        
         public DateTime StartDate { get; private set; }
-        public DateTime EndDate { get; }
-        public  IList<Product> Products { get; private set; } 
+        public DateTime EndDate { get; private set; }
+        public  ICollection<Product> Products { get; private set; } 
 
         private Contract()
         {
-            ContractID = Guid.NewGuid();
+            ID = Guid.NewGuid();
             Products = new List<Product>();
             AddDefaultProducts();
         }

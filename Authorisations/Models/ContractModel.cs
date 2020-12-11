@@ -5,7 +5,7 @@ namespace Authorisations.Models
 {
     public class ContractModel
     {
-        public Guid ContractID { get; set; }
+        public Guid ID { get; set; }
         public OrganisationModel Organisation { get; set;  }
         public  string AuthorizerMailAddress { get; set; }
         public DateTime StartDate { get; set;  }

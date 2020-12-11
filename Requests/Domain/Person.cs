@@ -17,7 +17,7 @@ namespace Requests.Domain
         }
 
         // properties
-        public int PersonId { get; private set; }
+        public int ID { get; private set; }
 
         public string FirstName { get; private set;}
 

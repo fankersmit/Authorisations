@@ -35,7 +35,7 @@ namespace RequestsApp
             var connectionString  = GetConnectionString();
             
             services.AddLogging(configure => configure.AddConsole())
-                .AddTransient<RabbitMQServer>()
+                .AddSingleton<RabbitMQServer>()
                 .AddTransient<ICommandHandler, CommandHandler>()
                 .AddTransient<IQueryHandler, QueryHandler>()
                 .AddEntityFrameworkSqlite()

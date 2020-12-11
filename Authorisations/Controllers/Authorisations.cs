@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
@@ -34,6 +35,7 @@ namespace Authorisations.Controllers
             request.Command = Commands.Submit;
             var content = request.SerializeToJson();
             _client.Post( content);
+            _logger.LogInformation( "Submitted posted request to RMQ client");
             return Accepted();
         }
         
@@ -41,7 +43,7 @@ namespace Authorisations.Controllers
         [Route("request/submit/product")]
         [Route("request/submit/organisation")]
          */
-
+#nullable enable 
         [HttpGet]
         [Route("requests/under-consideration")]
         [Route("requests/under-consideration/{requestType}")]
@@ -69,7 +71,7 @@ namespace Authorisations.Controllers
             var response  = new Dictionary<string,string> {{ underConsideration, result}};
             return response;
         }
-        
+ #nullable disable       
         [HttpGet]
         [ProducesResponseType(typeof(Dictionary<string,string>), StatusCodes.Status200OK)]
         public object Get()

@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Requests.Domain;
+using Requests.Shared.Domain;
 using RequestsApp.Infrastructure;
 using Tests.Helpers;
 using Xunit;
@@ -21,6 +22,25 @@ namespace Test.RequestApp
         }
 
         [Fact]
+        public void HandlerExecutesSubmitCommand()
+        {
+            // arrange
+            var server = CreateRMQServer();
+            var request = Factory.CreateAccountRequest();
+            var requestId = request.ID;
+            var command = Commands.Submit;
+            
+            // act
+            server.Run(Fixture.Context); // wire up event handling
+            server.CommandHandler.Handle(request, command); // submit and save to store
+            
+            var db = Fixture.Context; 
+            var actual = db.AccountRequests.Find(requestId);
+            // assert
+            actual.Status.Should().Be(RequestStatus.Submitted);
+        }
+
+        [Fact]
         public void CanInjectRequestHandlersIntoBroker()
         {
             // Arrange
@@ -31,7 +51,7 @@ namespace Test.RequestApp
 
             // Act
             var rabbitMQServer = new RabbitMQServer(logger, requestHandler,queryHandler );
-            rabbitMQServer.Run();
+            rabbitMQServer.Run( Fixture.Context);
 
             // Assert
             Assert.Equal(requestHandler,  rabbitMQServer.CommandHandler);
@@ -54,7 +74,7 @@ namespace Test.RequestApp
         {
             // arrange
             var request = Factory.CreateAccountRequest();
-            var requestId = request.Id;
+            var requestId = request.ID;
             var db = Fixture.Context; 
             // act
             db.Add(request);
@@ -62,6 +82,20 @@ namespace Test.RequestApp
             var actual = db.AccountRequests.Find(requestId);
             // assert
             actual.Should().BeEquivalentTo(request);
+        }
+        
+        // private helper method
+        RabbitMQServer CreateRMQServer()
+        {
+            // Arrange
+            ICommandHandler requestHandler = new CommandHandler();
+            IQueryHandler queryHandler = new QueryHandler();
+            using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+            var logger = loggerFactory.CreateLogger<RabbitMQServer>();
+
+            // Act
+            var rabbitMQServer = new RabbitMQServer(logger, requestHandler,queryHandler );
+            return rabbitMQServer;
         }
     }
 }
