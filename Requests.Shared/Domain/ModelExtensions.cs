@@ -12,7 +12,6 @@ namespace Requests.Shared.Domain
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                //PropertyNameCaseInsensitive = true,
                 Converters =
                 {
                     new JsonStringEnumConverter()
@@ -27,7 +26,6 @@ namespace Requests.Shared.Domain
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                //PropertyNameCaseInsensitive = true,
                 Converters =
                 {
                     new JsonStringEnumConverter()

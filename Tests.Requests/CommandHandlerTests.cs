@@ -67,15 +67,15 @@ namespace Tests.Requests
             var handler = new CommandHandler();
             
             // act
-            var previousCount = dbContext.AccountRequests.Count(); 
+            var previousCount = dbContext.RequestDocuments.Count(); 
             handler.CommandHandled += dbContext.OnCommandExecuted;   //suscribe to command
             handler.Handle(request, Commands.Submit);
-            var actual = dbContext.AccountRequests.Find(requestId);
+            var actual = dbContext.RequestDocuments.Find(requestId);
             
             // assert
             copy.Status.Should().Be(RequestStatus.New);
-            actual.Status.Should().Be(RequestStatus.Submitted);
-            dbContext.AccountRequests.Count().Should().BeGreaterThan(previousCount);
+            actual.Request.Status.Should().Be(RequestStatus.Submitted);
+            dbContext.RequestDocuments.Count().Should().BeGreaterThan(previousCount);
         }
 
         // helper classes and methods

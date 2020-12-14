@@ -1,3 +1,4 @@
+using System.Configuration;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Requests.Domain;
@@ -35,9 +36,9 @@ namespace Test.RequestApp
             server.CommandHandler.Handle(request, command); // submit and save to store
             
             var db = Fixture.Context; 
-            var actual = db.AccountRequests.Find(requestId);
+            var actual = db.RequestDocuments.Find(requestId);
             // assert
-            actual.Status.Should().Be(RequestStatus.Submitted);
+            actual.Request.Status.Should().Be(RequestStatus.Submitted);
         }
 
         [Fact]
@@ -58,7 +59,7 @@ namespace Test.RequestApp
             Assert.Equal(queryHandler, rabbitMQServer.QueryHandler);
         }
        
-        [Theory]
+        [Theory(Skip="Works for now, reactivate when integration test scenarios change")]
         [InlineData("rider64", true)]    // works only if tests are run from within IDE
         [InlineData("GreatExpectations", false)]
         public void CanDetermineIfProcessIsRunning(string  processName, bool expected)
@@ -70,18 +71,19 @@ namespace Test.RequestApp
         }
 
         [Fact]
-        public void CanSaveRequestToDatabase()
+        public void CanSaveRequestDocumentToDatabase()
         {
             // arrange
             var request = Factory.CreateAccountRequest();
+            var requestDocument = RequestDocumentFactory.Create(request, Commands.Submit);
             var requestId = request.ID;
             var db = Fixture.Context; 
             // act
-            db.Add(request);
+            db.Add(requestDocument);
             db.SaveChanges();
-            var actual = db.AccountRequests.Find(requestId);
+            var actual = db.RequestDocuments.Find(requestId);
             // assert
-            actual.Should().BeEquivalentTo(request);
+            actual.Request.Should().BeEquivalentTo(request);
         }
         
         // private helper method
