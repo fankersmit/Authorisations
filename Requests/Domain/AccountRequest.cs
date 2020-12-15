@@ -16,7 +16,7 @@ namespace Requests.Domain
          {
          }
 
-         public AccountRequest( Person applicant, Contract contract) : this()
+         public AccountRequest( Person applicant, Contract contract) 
          {
              Applicant = applicant;
              Contract = contract;

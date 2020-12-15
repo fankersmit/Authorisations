@@ -39,7 +39,7 @@ namespace Tests.Controllers
         public void CanSerialise_ProductModel_ToJson_AndBack()
         {
             // arrange
-            var model = _factory.CreateProduct();
+            var model = _factory.CreateProduct(0);
             // act
             var json = model.SerializeToJson<ProductModel>();
             var model2 = json.DeSerializeFromJson<ProductModel>();

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Requests.Domain;
 using Requests.Shared.Domain;
 
@@ -19,9 +20,12 @@ namespace RequestsApp.Infrastructure
         // methods
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var converter = new EnumToStringConverter<Commands>();
+            
             modelBuilder.Entity<RequestDocument>().HasKey(x => x.ID);
             modelBuilder.Entity<RequestDocument>().Ignore(b => b.Request);
             modelBuilder.Entity<RequestDocument>().Ignore(b => b.Document);
+            modelBuilder.Entity<RequestDocument>().Property(b => b.Command).HasConversion(converter);
             base.OnModelCreating(modelBuilder);
         }
 

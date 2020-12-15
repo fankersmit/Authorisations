@@ -17,7 +17,7 @@ namespace Test.RequestApp
             var request = DomainTypesFactory.Instance.CreateAccountRequest();
 
             // act
-            var document = RequestDocumentFactory.Create(request);
+            var document = RequestDocumentFactory.Create(request, Commands.NoOp);
             // assert
             document.Should().BeOfType<RequestDocument>();
             document.Request.Should().Be(request);
@@ -52,7 +52,7 @@ namespace Test.RequestApp
         {
             // arrange
             var request = DomainTypesFactory.Instance.CreateAccountRequest();
-            var document = RequestDocumentFactory.Create(request);
+            var document = RequestDocumentFactory.Create(request, Commands.NoOp);
 
             // act
             var jsonDocument = document.Document;

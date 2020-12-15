@@ -1,9 +1,11 @@
 using System;
-using System.ComponentModel.Design;
 using System.IO;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Authorisations.Models;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Xunit;
 using Requests.Domain;
 using Requests.Shared.Domain;
@@ -11,7 +13,19 @@ using Tests.Helpers;
   
 namespace Tests.Requests
 {
-    
+    public class PersonConverter : JsonConverter<Person>
+    {
+        public override Person Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return JsonSerializer.Deserialize<Person>(reader.GetString());
+        }
+
+        public override void Write(Utf8JsonWriter writer, Person person, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue( JsonSerializer.Serialize(person,options) );
+        }
+    }
+
     public class AccountRequestTests
     {
         readonly DomainTypesFactory factory = DomainTypesFactory.Instance;
@@ -26,10 +40,20 @@ namespace Tests.Requests
             
             // act
             var body = model.SerializeToJson<RequestModel>();
-            var request = body.DeSerializeFromJson<AccountRequest>();
+            var options = new JsonSerializerOptions()
+            {
+                Converters =
+                {
+                    new PersonConverter()
+                }
+            };
+            var request = JsonSerializer.Deserialize<AccountRequest>(Encoding.UTF8.GetString(body), options);
             var command = body.DeSerializeFromJson<Commands>( "Command");
             
             // assert
+            request.Applicant.Should().NotBeNull();
+            request.Contract.Should().NotBeNull();
+            request.Contract.Products.Should().NotBeNull();
             request.Should().BeOfType<AccountRequest>();
             command.Should().BeOfType<Commands>();
             command.Should().Be(Commands.Submit);

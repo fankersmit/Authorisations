@@ -13,10 +13,8 @@ namespace Requests.Domain
         public DateTime DateLastUpdated { get; protected set; }
         public RequestStatus Status { get; protected set; }
         public string Remarks { get; protected set; }
-
         // requester properties
         public Person Applicant { get; protected set; }
-        
         // contract
         public Contract Contract { get; protected set; }
         

@@ -32,6 +32,12 @@ namespace Tests.Helpers
         private readonly Random _random; 
         
         #region testdata
+        private static List<(string name, string desc, int key)> products = 
+            new List<(string, string, int)> {
+                ("MijnAGB", "Self service van mijn persoonlijjke AGB code", 105),
+                ("MijnVektis", "Self service van mijn vektis account", 123)
+            };
+        
         private static List<string> firstNames = new List<string> {
             "Ayana", "Tracie", "Shiela", "Duncan", "Tonisha", 
             "Daren", "Dong", "Marian", "Mad", "Alica", "Joke"
@@ -62,6 +68,7 @@ namespace Tests.Helpers
             var idx2 = _random.Next(0, 10);
             return new PersonModel()
             {
+                ID = _random.Next(100, 100000),
                 FirstName = firstNames[idx1],
                 LastName = lastNames[idx2]
             };
@@ -100,6 +107,7 @@ namespace Tests.Helpers
             var endDate = DateTime.Now.AddYears(duration);
             return new ContractModel()
             {
+                ID = Guid.NewGuid(),
                 Organisation = organisation, 
                 AuthorizerMailAddress = email, 
                 StartDate = startDate, 
@@ -115,30 +123,37 @@ namespace Tests.Helpers
             var startDate = DateTime.Now.Subtract(new TimeSpan(48, 0, 0));
             var endDate = DateTime.Now.AddYears(duration);
             return new ContractModel()
-                { 
-                    Organisation = organisation, 
-                    AuthorizerMailAddress = email, 
-                    StartDate = startDate, 
-                    EndDate = endDate
-                    
-                };           
+            {
+                ID = Guid.NewGuid(),
+                Organisation = organisation,
+                AuthorizerMailAddress = email,
+                StartDate = startDate,
+                EndDate = endDate,
+                Products = new List<ProductModel>
+                {
+                    {CreateProduct(0)},
+                    {CreateProduct(1)}
+                }   
+            };           
         }
 
-        public ProductModel CreateProduct()
+        public ProductModel CreateProduct( int idx)
         {
-            return new ProductModel()
+                return new ProductModel
                 {
-                    Name = "AGB", 
-                    Description  = "Algemeen gegevens beheer",
-                    StartDate = DateTime.UtcNow.AddDays(-365),
-                    EndDate = DateTime.UtcNow.AddDays(365),                   
-                };    
+                    Name = products[idx].name,
+                    Description = products[idx].desc,
+                    ID = products[idx].key,
+                    StartDate = DateTime.Today.Subtract(new TimeSpan(24, 0, 0)),
+                    EndDate = DateTime.Today.AddYears(3)
+                };
         }
         
         public RequestModel CreateRequest( PersonModel applicant, ContractModel contract )
         {
             return new RequestModel()
             {
+                ID = Guid.NewGuid(),
                 Applicant = applicant,
                 Contract = contract
             };
@@ -150,10 +165,10 @@ namespace Tests.Helpers
             var org = CreateOrganisation();
             var contract = CreateContract(org);
             return new RequestModel()
-            { 
+            {
+                ID = Guid.NewGuid(),
                 Applicant = applicant, 
                 Contract =  contract
-                
             };
         }
         

@@ -31,6 +31,13 @@ namespace Tests.Helpers
         private readonly Random _random; 
         
         #region testdata
+
+        private static List<(string name, string desc, int key)> products = 
+            new List<(string, string, int)> {
+            ("MijnAGB", "Self service van mijn persoonlijjke AGB code", 105),
+            ("MijnVektis", "Self service van mijn vektis account", 123)
+        };
+
         private static List<string> firstNames = new List<string> {
             "Ayana", "Tracie", "Shiela", "Duncan", "Tonisha", 
             "Daren", "Dong", "Marian", "Mad", "Alica", "Joke"
@@ -82,7 +89,10 @@ namespace Tests.Helpers
             var organisation = CreateOrganisation(orgData);
             var startDate = DateTime.Now.Subtract(new TimeSpan(48, 0, 0));
             var endDate = DateTime.Now.AddYears(duration);
-            return new Contract(organisation, email, startDate, endDate);           
+            var contract = new Contract(organisation, email, startDate, endDate);
+            contract.Products.Add(CreateProduct("AGB"));
+            contract.Products.Add(CreateProduct("MijnVektis"));
+            return contract;
         }
    
         public Contract CreateContract( Organisation organisation )
@@ -95,11 +105,20 @@ namespace Tests.Helpers
             return new Contract(organisation, email, startDate, endDate);           
         }
 
-        public Product CreateProduct()
+        public Product CreateProduct(string productNaam)
         {
-            return new Product("AGB", "Algemeen gegevens beheer");    
+            int idx = productNaam == "AGB" ? 0 : 1;
+            
+            return new Product
+            {
+                Name = products[idx].name,
+                Description = products[idx].desc,
+                ID = products[idx].key,
+                StartDate = DateTime.Today.Subtract(new TimeSpan(24, 0, 0)),
+                EndDate = DateTime.Today.AddYears(3)
+            };
         }
-        
+
         public AccountRequest CreateAccountRequest( Person applicant, Contract contract )
         {
             return new AccountRequest(applicant, contract);
