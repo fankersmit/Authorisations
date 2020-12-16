@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 using Requests.Domain;
 
 namespace Tests.Helpers
@@ -94,15 +95,17 @@ namespace Tests.Helpers
             contract.Products.Add(CreateProduct("MijnVektis"));
             return contract;
         }
-   
-        public Contract CreateContract( Organisation organisation )
+
+        public Contract CreateContract(Organisation organisation)
         {
             var duration = _random.Next(0, 5);
-            var idx = _random.Next(0, 10); 
-            var email = CreateEmail( firstNames[idx], lastNames[idx], "gmail.com");
+            var idx = _random.Next(0, 10);
+            var email = CreateEmail(firstNames[idx], lastNames[idx], "gmail.com");
             var startDate = DateTime.Now.Subtract(new TimeSpan(48, 0, 0));
             var endDate = DateTime.Now.AddYears(duration);
-            return new Contract(organisation, email, startDate, endDate);           
+            var contract = new Contract(organisation, email, startDate, endDate);
+            contract.AddDefaultProducts();
+            return contract;
         }
 
         public Product CreateProduct(string productNaam)
@@ -135,8 +138,26 @@ namespace Tests.Helpers
         // helper methods
         private string CreateEmail(string firstName, string lastName, string domainName)
         {
-           var email = $"{firstName}.{lastName}@{domainName}".Trim().Trim('.');
+           var first = RemoveWhitespace(firstName, ' ');
+           var last = RemoveWhitespace(lastName, ' ');
+           var email = $"{first}.{last}@{domainName}".Trim().Trim('.');
            return email;
+        }
+
+        private string RemoveWhitespace(string input,char whiteSpace )
+        {
+            var len = input.Length;
+            var src = input.ToCharArray();
+            var output = new StringBuilder();
+            for( var i =0; i< len; i++)
+            {
+                var chr = src[i]; 
+                if( src[i] != whiteSpace )
+                {
+                    output.Append(chr);
+                }
+            }
+            return output.ToString();
         }
     }
 }

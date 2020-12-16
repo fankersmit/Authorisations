@@ -32,12 +32,9 @@ namespace Requests.Domain
         {
             var options = new JsonSerializerOptions
             {
-                WriteIndented = true,
-                Converters =
-                {
-                    new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
-                }
+                WriteIndented = true
             };
+            options.Converters.Add(new JsonStringEnumConverter());
             return JsonSerializer.SerializeToUtf8Bytes(this, options);   
         }
 

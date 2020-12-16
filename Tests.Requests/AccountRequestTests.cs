@@ -1,64 +1,104 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Authorisations.Models;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Xunit;
 using Requests.Domain;
 using Requests.Shared.Domain;
 using Tests.Helpers;
-  
+
+
 namespace Tests.Requests
 {
-    public class PersonConverter : JsonConverter<Person>
-    {
-        public override Person Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            return JsonSerializer.Deserialize<Person>(reader.GetString());
-        }
-
-        public override void Write(Utf8JsonWriter writer, Person person, JsonSerializerOptions options)
-        {
-            writer.WriteStringValue( JsonSerializer.Serialize(person,options) );
-        }
-    }
-
     public class AccountRequestTests
     {
-        readonly DomainTypesFactory factory = DomainTypesFactory.Instance;
-        readonly ModelTypesFactory _requestModelFactory = ModelTypesFactory.Instance;
+        private readonly DomainTypesFactory factory = DomainTypesFactory.Instance;
+        private readonly ModelTypesFactory _requestModelFactory = ModelTypesFactory.Instance;
 
         [Fact]
-        public void CanDeSerializeRequestFromModel()
+        public void CanConstituteRequestFromModel()
         {
             // arrange
             var model = _requestModelFactory.CreateRequest();
+            var applicant_firstName = model.Applicant.FirstName;
+            var applicant_ID = model.Applicant.ID;
             model.Command = Commands.Submit;
-            
+           
             // act
-            var body = model.SerializeToJson<RequestModel>();
             var options = new JsonSerializerOptions()
             {
-                Converters =
-                {
-                    new PersonConverter()
-                }
+                AllowTrailingCommas = true,
             };
-            var request = JsonSerializer.Deserialize<AccountRequest>(Encoding.UTF8.GetString(body), options);
-            var command = body.DeSerializeFromJson<Commands>( "Command");
+            options.Converters.Add(new JsonStringEnumConverter()); 
+            var body = JsonSerializer.Serialize(model, options);
             
+            var requestDocument = JsonDocument.Parse(body);
+            var request = Reconstitute(requestDocument);
+            var command = UTF8Encoding.UTF8.GetBytes(body).DeSerializeFromJson<Commands>("Command");
+
             // assert
             request.Applicant.Should().NotBeNull();
-            request.Contract.Should().NotBeNull();
-            request.Contract.Products.Should().NotBeNull();
+            request.Applicant.ID.Should().Be(applicant_ID);
+            request.Applicant.FirstName.Should().Be(applicant_firstName);
+            //request.Contract.Should().NotBeNull();
+            //request.Contract.Products.Should().NotBeNull();
             request.Should().BeOfType<AccountRequest>();
             command.Should().BeOfType<Commands>();
             command.Should().Be(Commands.Submit);
         }
+
+        private AccountRequest Reconstitute(JsonDocument requestDocument) 
+        {
+             var result = new AccountRequest();
+
+            PropertyInfo[] properties = typeof(AccountRequest).GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                Type t = property.PropertyType;
+                switch (t.Name)
+                {
+                    case "Person":
+                        var personelement = requestDocument.RootElement.GetProperty("Applicant");
+                        var applicant = new Person("","","");
+                        applicant.Reconstitute(personelement); 
+                        property.SetValue(result, applicant);
+                        break;
+                    case "RequestStatus":
+                        var enumValue = requestDocument.RootElement.GetProperty(property.Name).GetString();
+                        property.SetValue(result, Enum.Parse<RequestStatus>(enumValue));
+                        break;
+                    case "Guid":
+                        var guidValue = requestDocument.RootElement.GetProperty(property.Name).GetGuid();
+                        property.SetValue(result, guidValue);
+                        break;
+                    case "String":
+                        var stringValue = requestDocument.RootElement.GetProperty(property.Name).GetString();
+                        property.SetValue(result, stringValue);
+                        break;
+                    case "DateTime":
+                        var dateValue = requestDocument.RootElement.GetProperty(property.Name).GetDateTime();
+                        property.SetValue(result, dateValue);
+                        break;
+                    case "Int32":
+                        var intValue = requestDocument.RootElement.GetProperty(property.Name).GetInt32();
+                        property.SetValue(result, intValue);
+                        break;
+                    default:
+                        //throw new InvalidOperationException();
+                        break;
+                }
+            }
+            
+            return result;
+            
+        }
         
+        
+
         [Fact]
         public void NewRequestHasFieldCorrectLyInitialized()
         {
@@ -88,18 +128,6 @@ namespace Tests.Requests
             var file = Path.Combine(path, $"{ar.ID}.{extension}");
             // assert
             Assert.True(File.Exists(file));
-        }
-
-        [Fact]
-        public void CanSerializeToJson()
-        {
-            // arrange
-            var ar = factory.CreateAccountRequest();
-            // act
-            var jsonString = ar.ToJson();
-            var result = JsonSerializer.Deserialize<AccountRequest>(jsonString);
-            // Assert
-            Assert.IsType<AccountRequest>(result);
         }
     }
 }

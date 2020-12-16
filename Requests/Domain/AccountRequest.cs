@@ -12,7 +12,7 @@ namespace Requests.Domain
          // accountRequest properties
          
          // constructors
-         private AccountRequest()
+         public AccountRequest()
          {
          }
 

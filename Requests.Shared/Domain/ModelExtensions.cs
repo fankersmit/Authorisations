@@ -20,17 +20,12 @@ namespace Requests.Shared.Domain
             return JsonSerializer.SerializeToUtf8Bytes<TRequest>( model, options);
         }
         
-        public static TRequest DeSerializeFromJson<TRequest>(this byte[] model)
+       public static TRequest DeSerializeFromJson<TRequest>(this byte[] model)
         {
             var readOnlySpan = new ReadOnlySpan<byte>(model);
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Converters =
-                {
-                    new JsonStringEnumConverter()
-                }
-            };
+            var options = new JsonSerializerOptions();
+            options.WriteIndented = true;
+            options.Converters.Add(new JsonStringEnumConverter()); 
             return JsonSerializer.Deserialize<TRequest>(readOnlySpan, options);
         }
 

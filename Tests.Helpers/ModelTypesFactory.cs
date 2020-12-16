@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Diagnostics;
 using Authorisations.Models;
+using Requests.Shared.Domain;
 
 namespace Tests.Helpers
 {
@@ -151,12 +153,16 @@ namespace Tests.Helpers
         
         public RequestModel CreateRequest( PersonModel applicant, ContractModel contract )
         {
-            return new RequestModel()
-            {
+            var requestModel = new RequestModel() {
                 ID = Guid.NewGuid(),
-                Applicant = applicant,
-                Contract = contract
+                DateCreated =  DateTime.UtcNow,
+                DateLastUpdated = DateTime.UtcNow,
+                Status = RequestStatus.New,
+                Command =  Commands.NoOp             
             };
+            requestModel.Applicant = applicant;
+            requestModel.Contract = contract;
+            return requestModel;
         }
         
         public RequestModel CreateRequest()
@@ -164,12 +170,7 @@ namespace Tests.Helpers
             var applicant = CreateApplicant();
             var org = CreateOrganisation();
             var contract = CreateContract(org);
-            return new RequestModel()
-            {
-                ID = Guid.NewGuid(),
-                Applicant = applicant, 
-                Contract =  contract
-            };
+            return CreateRequest(applicant, contract);
         }
         
         // helper methods

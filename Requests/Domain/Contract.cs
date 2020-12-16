@@ -17,7 +17,6 @@ namespace Requests.Domain
         {
             ID = Guid.NewGuid();
             Products = new List<Product>();
-            AddDefaultProducts();
         }
         
         public Contract(Organisation org, string email, DateTime start, DateTime end) : this()
@@ -26,10 +25,14 @@ namespace Requests.Domain
             AuthorizerMailAddress = email;
             StartDate = start;
             EndDate = end;
-            
         }
 
-        private void AddDefaultProducts()
+        public bool HasProducts()
+        {
+            return (Products.Count > 0);
+        }
+
+        public void AddDefaultProducts()
         {
             var name ="MijnVektis";
             var description = "Self service van mijn vektis account";
