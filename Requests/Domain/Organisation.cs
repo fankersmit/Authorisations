@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 
 namespace Requests.Domain
 {
@@ -11,6 +10,12 @@ namespace Requests.Domain
         public string Description { get; private set; }
 
         // ctors
+        public Organisation()
+        {
+            ID  = Guid.NewGuid();
+            Initialize(string.Empty, string.Empty);
+        }
+        
         public Organisation(string name, string description)
         {
             ID  = Guid.NewGuid();
@@ -23,11 +28,7 @@ namespace Requests.Domain
             Initialize(name, description);
         }
 
-        private Organisation()
-        {
-        }
-
-        private void Initialize(string name, string description)
+        public void Initialize(string name, string description)
         {
             Name = name;
             Description = description;            

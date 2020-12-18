@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Requests.Domain;
 using Requests.Shared.Domain;
@@ -137,16 +136,19 @@ namespace RequestsApp.Infrastructure
             };
 
         }
-#nullable enable
-        private void OnConsumerOnReceived(object? model, BasicDeliverEventArgs ea)
+
+        private void OnConsumerOnReceived(object model, BasicDeliverEventArgs ea)
         {
             var body = ea.Body.ToArray();
-            var request = body.DeSerializeFromJson<AccountRequest>();
-            var command = body.DeSerializeFromJson<Commands>("Command");
+            var requestBuilder = new RequestFromJsonBuilder(null);
+            var jsonDocument = JsonDocument.Parse(body);
+            var request = requestBuilder.GetRequest(jsonDocument.RootElement);
+            var command = requestBuilder.GetCommand(jsonDocument.RootElement.GetProperty("Command"));
+            //var request = body.DeSerializeFromJson<AccountRequest>();
+            //var command = body.DeSerializeFromJson<Commands>("Command");
             _commandHandler.Handle(request, command);
             _logger.LogInformation($"handled {command.ToString()} command for request with ID {request.ID} at {DateTime.UtcNow}");
         }
-#nullable disable
         
         private int GetRequestsUnderConsideration(byte[] body)
         {

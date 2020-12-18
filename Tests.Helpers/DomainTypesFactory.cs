@@ -124,7 +124,9 @@ namespace Tests.Helpers
 
         public AccountRequest CreateAccountRequest( Person applicant, Contract contract )
         {
-            return new AccountRequest(applicant, contract);
+            var request = new AccountRequest(applicant, contract);
+            request.Remarks = "No remarks!";
+            return request;
         }
         
         public AccountRequest CreateAccountRequest()
@@ -132,7 +134,9 @@ namespace Tests.Helpers
             var applicant = CreateApplicant();
             var org = CreateOrganisation();
             var contract = CreateContract(org);
-            return new AccountRequest(applicant, contract);
+            var request = new AccountRequest(applicant, contract);
+            request.Remarks = "No remarks!";
+            return request;
         }
         
         // helper methods

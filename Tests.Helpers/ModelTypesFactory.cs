@@ -158,7 +158,8 @@ namespace Tests.Helpers
                 DateCreated =  DateTime.UtcNow,
                 DateLastUpdated = DateTime.UtcNow,
                 Status = RequestStatus.New,
-                Command =  Commands.NoOp             
+                Command =  Commands.NoOp,    
+                Remarks = "No remarks."
             };
             requestModel.Applicant = applicant;
             requestModel.Contract = contract;

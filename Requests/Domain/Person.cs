@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Text.Json;
 
 namespace Requests.Domain
 {
-    public class Person : IReconstitutable<Person>
+    public class Person 
     {
         // properties
         public int ID { get; private set; }
@@ -18,19 +13,15 @@ namespace Requests.Domain
         public Person(int  Id, string firstName, string lastName, string salutation = "")
         {
             ID = Id;
-            FirstName = firstName;
-            LastName = lastName;
-            Salutation = salutation;
+            Initialize(firstName, lastName, salutation);
         }
         
         public Person(string firstName, string lastName, string salutation = "")
         {
-            FirstName = firstName;
-            LastName = lastName;
-            Salutation = salutation;
+            Initialize(firstName, lastName, salutation);
         }
 
-        private Person()
+        public Person()
         {
         }
 
@@ -41,43 +32,11 @@ namespace Requests.Domain
             return fullName.Trim().Replace("  ", " ");
         }
 
-        public bool Reconstitute(JsonElement personElement)
+        public void Initialize(string firstName, string lastName, string salutation = "")
         {
-            var missingProperties = 0;
-            PropertyInfo[] properties = typeof(Person).GetProperties();
-            foreach (PropertyInfo property in properties)
-            {
-                Type t = property.PropertyType;
-                switch (t.Name)
-                {
-                    case "String":
-                        string stringValue = string.Empty;
-                        try
-                        {
-                            stringValue = personElement.GetProperty(property.Name).GetString();
-                            property.SetValue(this, stringValue);
-                        }
-                        catch (KeyNotFoundException e)
-                        {
-                            ++missingProperties;
-                        }
-
-                        break;
-                    case "Int32":
-                        var intValue = 0;
-                        try
-                        {
-                            intValue = personElement.GetProperty(property.Name).GetInt32();
-                            property.SetValue(this, intValue);
-                        }
-                        catch (KeyNotFoundException e)
-                        {
-                            ++missingProperties;
-                        }
-                        break;
-                }
-            }
-            return (missingProperties == 0);
+            FirstName = firstName;
+            LastName = lastName;
+            Salutation = salutation;           
         }
     }
 }

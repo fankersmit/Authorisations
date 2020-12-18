@@ -5,6 +5,6 @@ namespace Authorisations.Models
         public int ID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        private string Salutation { get; set; }
+        public string Salutation { get; set; }
     }
 }

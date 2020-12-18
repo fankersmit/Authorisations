@@ -12,7 +12,7 @@ namespace Requests.Domain
         public DateTime DateCreated { get; protected set; }
         public DateTime DateLastUpdated { get; protected set; }
         public RequestStatus Status { get; protected set; }
-        public string Remarks { get; protected set; }
+        public string Remarks { get; set; }
         // requester properties
         public Person Applicant { get; protected set; }
         // contract
