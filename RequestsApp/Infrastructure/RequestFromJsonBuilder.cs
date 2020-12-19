@@ -127,7 +127,7 @@ namespace RequestsApp.Infrastructure
             foreach (PropertyInfo property in properties)
             {
                 Type t = property.PropertyType;
-                switch (t.Name)
+                switch (property.Name)
                 {
                     // Products
                     case "Products":
@@ -139,19 +139,19 @@ namespace RequestsApp.Infrastructure
                         Organisation orgVal = GetOrganisation(jsonElement.GetProperty("Organisation")); 
                         property.SetValue(contract , orgVal);
                         break;
-                    // startDate, EndDate
-                    case "DateTime":
+                    // CReation and update Date
+                    case "StartDate":
+                    case "EndDate":
                         var  guidVal = jsonElement.GetProperty(property.Name).GetDateTime();
                         property.SetValue(contract , guidVal);
                         break;
                     // Email
-                    case "String":
+                    case "AuthorizerMailAddress":
                         var strVal = jsonElement.GetProperty(property.Name).GetString();
                         property.SetValue(contract , strVal);
                         break;
-                    
                     // ID
-                    case "Guid":
+                    case "ID":
                         var intVal = jsonElement.GetProperty(property.Name).GetGuid();
                         property.SetValue(contract , intVal);
                         break;

@@ -5,6 +5,7 @@ namespace Authorisations.Models
 {
     public class RequestModel : ICommand
     {
+        // properties
         public Guid ID { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateLastUpdated { get; set; }
@@ -13,5 +14,21 @@ namespace Authorisations.Models
         public ContractModel Contract { get; set; }
         public PersonModel Applicant { get; set; }
         public Commands Command { get; set; }
+        
+        // ctor
+        public RequestModel()
+        {
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            DateCreated = DateTime.UtcNow;
+            DateLastUpdated = DateCreated;
+            ID = Guid.NewGuid();
+            Status = RequestStatus.New;
+            Remarks = "";
+            Command = Commands.NoOp;
+        }
     }
 }

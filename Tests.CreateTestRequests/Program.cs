@@ -1,5 +1,9 @@
 ﻿using System;
-using Requests.Domain;
+using System.IO;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Authorisations.Models;
 using Tests.Helpers;
 
 
@@ -7,6 +11,8 @@ namespace Tests.CreateTestRequests
 {
     class Program
     {
+        private const string  _path =  @"C:\Projects\Authorisations\Documentation";
+            
         static void Main(string[] args)
         {
             if (args.Length != 4)
@@ -20,9 +26,8 @@ namespace Tests.CreateTestRequests
             for (var idx = 0; idx < count; idx++)
             {
                 var request = CreateRequest(requestType);
-                AccountRequest ar = request as AccountRequest;
-                var path =  @"C:\Projects\Authorisations\Documentation";
-                ar.SaveTo(path);
+                var jsonString = ConvertToJsonString(request);
+                SaveToFile( request.ID, jsonString, _path );
                 Console.WriteLine(request.ID);
             }
 
@@ -30,9 +35,30 @@ namespace Tests.CreateTestRequests
                 $"Created {count} {Enum.GetName(typeof(RequestType), requestType)} requests. Press any key...");
         }
 
-        private static RequestBase CreateRequest(object requestType)
+        private static string ConvertToJsonString(RequestModel model)
         {
-            RequestBase request;
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+            var json = JsonSerializer.SerializeToUtf8Bytes(model, options);
+            return Encoding.UTF8.GetString(json);
+        }
+
+        private static void SaveToFile( Guid key,  string jsonString, string path )
+        {
+            var  fullPath = Path.Combine(path,$"{key.ToString()}.json");
+            // note the using declaration
+            using StreamWriter outputFile = new StreamWriter(fullPath);
+            outputFile.WriteLine(jsonString);
+            outputFile.Flush();
+            outputFile.Close();
+        }
+
+        private static RequestModel CreateRequest(object requestType)
+        {
+            RequestModel request;
 
             switch (requestType)
             {
@@ -91,22 +117,26 @@ namespace Tests.CreateTestRequests
         // helper methods
         // ---------------------------------------------------------
         //
-        private static RequestBase CreateOrganisationRequest()
+        private static RequestModel CreateOrganisationRequest()
         {
             throw new NotImplementedException();
         }
 
-        private static RequestBase CreateAccountRequest()
+        private static RequestModel CreateAccountRequest()
         {
             // create organisation
-            var factory = DomainTypesFactory.Instance;
+            var factory = ModelTypesFactory.Instance;
             var org = factory.CreateOrganisation();
-            var applicant = factory.CreateApplicant();
-            var contract = factory.CreateContract(org);
-            return new AccountRequest(applicant, contract);
+            var model = new RequestModel
+            {
+                Contract = factory.CreateContract(org), 
+                Applicant = factory.CreateApplicant()
+            };
+
+            return model;
         }
 
-        private static RequestBase CreateProductRequest()
+        private static RequestModel CreateProductRequest()
         {
             throw new NotImplementedException();
         }

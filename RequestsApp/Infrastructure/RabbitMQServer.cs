@@ -144,8 +144,6 @@ namespace RequestsApp.Infrastructure
             var jsonDocument = JsonDocument.Parse(body);
             var request = requestBuilder.GetRequest(jsonDocument.RootElement);
             var command = requestBuilder.GetCommand(jsonDocument.RootElement.GetProperty("Command"));
-            //var request = body.DeSerializeFromJson<AccountRequest>();
-            //var command = body.DeSerializeFromJson<Commands>("Command");
             _commandHandler.Handle(request, command);
             _logger.LogInformation($"handled {command.ToString()} command for request with ID {request.ID} at {DateTime.UtcNow}");
         }
