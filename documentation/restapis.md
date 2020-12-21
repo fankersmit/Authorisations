@@ -20,7 +20,7 @@ term| definition or values
 </br>  
 
 *** 
-## API definiition
+## API definition
 
 |done|style|CQ|path | verb | success | Error | description|
 |:---:|:---:|:---:|:---|:---:|:---:|:---:|---|
@@ -58,23 +58,81 @@ term| definition or values
 |Concluded|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:yellow">Yes</span>|<span style="color:green">Yes</span>
 |Removed|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:red">No</span>|<span style="color:yellow">Yes</span>
 
-# state diagram of  authorisation process
+
+
+***
+# State diagram of authorisation process
+***
 
 ```mermaid
 stateDiagram
     [*] --> New
     Removed --> [*]
-
-    New --> Confirmed
     note right of New 
       Every state can transistion back onto itself
-    end note   
-    New --> Cancelled
+    end note 
+    New --> Submitted
+    Submitted --> Cancelled
+    Submitted --> Confirmed
+    Cancelled --> Removed
     Confirmed --> Approved
     Confirmed --> Disapproved
-    Cancelled --> Concluded
     Approved --> Concluded
     Disapproved --> Concluded
     Concluded --> Removed
+```    
+
+```mermaid
+classDiagram
+    RequestBase <|-- AccountRequest
+    RequestBase <|-- ProductRequest
+    RequestBase <|-- OrganisationRequest
+    RequestBase: + GUId ID
+    RequestBase: + DateTime DateCreated
+    RequestBase: + DateTime DateLastUpdated
+    RequestBase: + RequestStatus Status 
+    RequestBase: + String Remarks
+    RequestBase: + Person Applicant 
+    RequestBase: + Contract Contract
+    RequestBase: + Submit()
+    RequestBase: + Confirm()
+    RequestBase: + Cancel()
+    RequestBase: + Approve()
+    RequestBase: + Disapprove()
+    RequestBase: + Conclude()
+    RequestBase: + Remove()
+    Contract "1" --> "1" RequestBase: is base for request
+    Applicant "1" --> "1" RequestBase: is requesting access  
+
+class Person {
+   + int  ID
+   + String FirstName
+   + String LastName
+   + String Salutation
+   + string FullName()
+}
+
+class Contract {
+  + Guid ID
+  + Organisation Organisation
+  + Email AuthorizerEmailAddress
+  + DateTime  StartDate
+  + DateTime  EndDaTe
+  + Collection<Product> Products
+  + bool HasProduct(Product product)
+}
+
+class Product{
+  + Guid ID
+  + String Name
+  + String Description
+}
+
+class Organisation{
+  + Guid ID
+  + String Name
+  + String Description
+  + Initialize(string Name, string Description)
+}
 ```
   

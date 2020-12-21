@@ -39,8 +39,6 @@ namespace RequestsApp.Infrastructure
                         string enumValue = jsonRequest.GetProperty(property.Name).GetString();
                         property.SetValue(request, Enum.Parse<RequestStatus>(enumValue));
                         break;
-                    // Commands
-                    
                     // Person
                     case "Person":
                         var applicantValue = GetApplicant(jsonRequest.GetProperty("Applicant"));
@@ -53,8 +51,8 @@ namespace RequestsApp.Infrastructure
                         break;
                     // DateCreated, DateLastUpdated
                     case "DateTime":
-                        var  guidVal = jsonRequest.GetProperty(property.Name).GetDateTime();
-                        property.SetValue(request , guidVal);
+                        var  dateTimeVal = jsonRequest.GetProperty(property.Name).GetDateTime();
+                        property.SetValue(request , dateTimeVal);
                         break;
                     // Remarks
                     case "String":
@@ -63,7 +61,12 @@ namespace RequestsApp.Infrastructure
                         break;
                     // ID
                     case "Guid":
-                        var intVal = jsonRequest.GetProperty(property.Name).GetGuid();
+                        var guidVal = jsonRequest.GetProperty(property.Name).GetGuid();
+                        property.SetValue(request , guidVal);
+                        break;
+                    // Version
+                    case "Int32":
+                        var intVal = jsonRequest.GetProperty(property.Name).GetInt32();
                         property.SetValue(request , intVal);
                         break;
                 }
@@ -126,7 +129,6 @@ namespace RequestsApp.Infrastructure
             PropertyInfo[] properties = typeof(Contract).GetProperties();
             foreach (PropertyInfo property in properties)
             {
-                Type t = property.PropertyType;
                 switch (property.Name)
                 {
                     // Products

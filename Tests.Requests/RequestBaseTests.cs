@@ -2,6 +2,9 @@ using System;
 using Requests.Domain;
 using Requests.Shared.Domain;
 using Xunit;
+using FluentAssertions;
+using RequestsApp.Infrastructure;
+using Tests.Helpers;
 
 namespace Tests.Requests
 {
@@ -9,6 +12,18 @@ namespace Tests.Requests
 
     public class RequestBaseTests
     {
+        [Fact]
+        public void RequestVersionIsOneInNewRequest()
+        {
+            // arrange
+            var expectedVersion = 1;
+            var request = CreateTestRequest();
+            // act
+            var actualVersion = request.Version;
+            // assert
+            actualVersion.Should().Be(expectedVersion);
+        }
+
         [Fact]
         public void RequestIsCreatedWithStatusNew()
         {

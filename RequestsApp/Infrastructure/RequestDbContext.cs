@@ -1,5 +1,8 @@
+using System;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.Logging;
 using Requests.Domain;
 using Requests.Shared.Domain;
 
@@ -8,21 +11,21 @@ namespace RequestsApp.Infrastructure
     
     public class RequestDbContext : DbContext
     {
+        private readonly ILogger<RequestDbContext> _logger; 
         // ctors
-        public RequestDbContext ( DbContextOptions<RequestDbContext>  options ): base (options)
+        public RequestDbContext ( ILogger<RequestDbContext> logger, DbContextOptions<RequestDbContext>  options ): base (options)
         {
+            _logger = logger;
         }
 
         // repo
         public DbSet<RequestDocument> RequestDocuments { get; set; }
         
-        
         // methods
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             var converter = new EnumToStringConverter<Commands>();
-            
-            modelBuilder.Entity<RequestDocument>().HasKey(x => x.ID);
+            modelBuilder.Entity<RequestDocument>().HasKey(o => new { o.ID, o.Version });
             modelBuilder.Entity<RequestDocument>().Ignore(b => b.Request);
             modelBuilder.Entity<RequestDocument>().Ignore(b => b.Document);
             modelBuilder.Entity<RequestDocument>().Property(b => b.Command).HasConversion(converter);
@@ -33,17 +36,24 @@ namespace RequestsApp.Infrastructure
         {
             // create document
             var requestDocument = RequestDocumentFactory.Create(eventArgs.Request, eventArgs.CommandHandled);
-            
-            switch (eventArgs.CommandHandled)
+            var Id = requestDocument.ID;
+            var version = requestDocument.Version;
+            if (IsAlreadyAdded(Id, version))
             {
-                case Commands.Submit:
-                    this.RequestDocuments.Add(requestDocument) ;
-                    this.SaveChanges();
-                    break;
-                
-                default:
-                    break;
+                _logger.Log(LogLevel.Information,$"Skipped adding request with ID:{Id} and version:{version}");
+                return;
             }
+        
+            this.RequestDocuments.Add(requestDocument);
+            this.SaveChanges();
+        }
+
+        private bool IsAlreadyAdded(Guid Id, int version)
+        {
+            var local = this.Set<RequestDocument>()
+                .Local
+                .FirstOrDefault(entry => entry.ID.Equals(Id) && entry.Version.Equals(version));
+            return (local != null);
         }
     }
 }

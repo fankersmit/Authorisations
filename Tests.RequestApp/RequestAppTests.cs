@@ -28,6 +28,7 @@ namespace Test.RequestApp
             // arrange
             var server = CreateRMQServer();
             var request = Factory.CreateAccountRequest();
+            var version = request.Version;
             var requestId = request.ID;
             var command = Commands.Submit;
             
@@ -36,7 +37,7 @@ namespace Test.RequestApp
             server.CommandHandler.Handle(request, command); // submit and save to store
             
             var db = Fixture.Context; 
-            var actual = db.RequestDocuments.Find(requestId);
+            var actual = db.RequestDocuments.Find(requestId, version+1);
             // assert
             actual.Request.Status.Should().Be(RequestStatus.Submitted);
         }
@@ -81,7 +82,7 @@ namespace Test.RequestApp
             // act
             db.Add(requestDocument);
             db.SaveChanges();
-            var actual = db.RequestDocuments.Find(requestId);
+            var actual = db.RequestDocuments.Find(requestId, requestDocument.Version);
             // assert
             actual.Request.Should().BeEquivalentTo(request);
         }

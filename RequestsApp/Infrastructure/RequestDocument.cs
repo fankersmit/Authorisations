@@ -13,20 +13,20 @@ namespace RequestsApp.Infrastructure
         private readonly byte[] _requestSerializedToUTF8Bytes;
         
         // properties
-        public Guid ID  { get; private set; }                       
+        public Guid ID  { get; private set; }      
+        public int  Version  { get; internal set; }
         public long TimeStamp { get; private set; }
         public Commands Command { get; private set; }
         public RequestBase Request { get; private set; }
         public string SerializedRequest { get; private set; }
-
         // ReSharper disable once ConvertToAutoProperty
         public JsonDocument Document => _document;
-        
-
+      
         // ctors
         public RequestDocument(RequestBase request, Commands command)
         {
             TimeStamp = DateTime.UtcNow.Ticks;
+            Version = request.Version;
             ID = request.ID;
             Request = request;
             Command = command;
@@ -38,7 +38,7 @@ namespace RequestsApp.Infrastructure
         public RequestDocument() {}
 
         // methods
-       
+               
         
         // private helpers
         private JsonDocument CreateJsonFromRequest(RequestBase request)

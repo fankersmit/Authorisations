@@ -9,6 +9,9 @@ namespace Requests.Domain
     {
         // properties
         public Guid ID { get; protected set; }
+        // version is updated when, and only when request is persisted, with increments of 1  
+        // initial versionNumber  is 1
+        public int Version { get; protected set; }
         public DateTime DateCreated { get; protected set; }
         public DateTime DateLastUpdated { get; protected set; }
         public RequestStatus Status { get; protected set; }
@@ -21,6 +24,7 @@ namespace Requests.Domain
         // constructors
         protected RequestBase()
         {
+            Version = 1;
             ID = Guid.NewGuid();
             DateCreated = DateLastUpdated = DateTime.UtcNow;
             Status = RequestStatus.New;
@@ -78,9 +82,11 @@ namespace Requests.Domain
         }
         
         // private Helper methods
-        void UpdateStatus(RequestStatus newStatus)
+        
+        private void UpdateStatus(RequestStatus newStatus, bool incrementVersion = true )
         {
             if (newStatus == Status) return;
+            if (incrementVersion) Version += 1; 
             Status = newStatus;
             DateLastUpdated = DateTime.UtcNow;
         }

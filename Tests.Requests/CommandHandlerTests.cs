@@ -5,6 +5,7 @@ using FluentAssertions;
 using Xunit;
 using Requests.Domain;
 using Requests.Shared.Domain;
+using RequestsApp.Infrastructure;
 using Tests.Helpers;
 
 namespace Tests.Requests
@@ -23,10 +24,12 @@ namespace Tests.Requests
         }
 
         [Fact]
-        public void CanSubmitRequest()
+        public void VersionIsUpdated_HandlingCommand()
         {
             // arrange
+            const int expected = 2; 
             var request = Factory.CreateAccountRequest();
+            var version = request.Version;
             var dateCreated = request.DateCreated;
             var handler = new CommandHandler();
             
@@ -34,11 +37,11 @@ namespace Tests.Requests
             var actual = handler.Handle(request, Commands.Submit);
             
             // assert
-            actual.Should().BeTrue();
-            request.Status.Should().Be(RequestStatus.Submitted);
-            request.DateLastUpdated.Should().BeAfter(dateCreated);
+            request.Version.Should().NotBe(version);
+            request.Version.Should().Be(expected);
         }
 
+       
         [Fact]
         public void CanHandleSubmittedRequest()
         {
@@ -57,7 +60,7 @@ namespace Tests.Requests
         }
 
         [Fact]
-        public void SubmittedRequestIsStored()
+        public void OnSubmittedCommand_RequestIsStored()
         {
             // arrange
             var request = Factory.CreateAccountRequest();
@@ -68,9 +71,9 @@ namespace Tests.Requests
             
             // act
             var previousCount = dbContext.RequestDocuments.Count(); 
-            handler.CommandHandled += dbContext.OnCommandExecuted;   //suscribe to command
+            handler.CommandHandled += dbContext.OnCommandExecuted;   //subcribe to command
             handler.Handle(request, Commands.Submit);
-            var actual = dbContext.RequestDocuments.Find(requestId);
+            var actual = dbContext.RequestDocuments.Find(requestId,request.Version);
             
             // assert
             copy.Status.Should().Be(RequestStatus.New);
@@ -99,12 +102,12 @@ namespace Tests.Requests
             }
         }
         
-        public TRequest CreateDeepCopy<TRequest>( TRequest model)
+        public RequestBase CreateDeepCopy( RequestBase model)
         {
-            var options = new JsonSerializerOptions {WriteIndented = true};
-            byte[] serialized = JsonSerializer.SerializeToUtf8Bytes<TRequest>( model, options);
-            var readOnlySpan = new ReadOnlySpan<byte>(serialized);
-            return JsonSerializer.Deserialize<TRequest>(readOnlySpan);
+            var json = model.SerializeToJson();
+            var document = JsonDocument.Parse(json);
+            var builder = new RequestFromJsonBuilder(null);
+            return builder.GetRequest(document.RootElement);
         }
     }
 }

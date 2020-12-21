@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Mail;
-using System.Reflection;
-using System.Text.Json;
 
 namespace Requests.Domain
 {

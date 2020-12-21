@@ -7,6 +7,7 @@ namespace Authorisations.Models
     {
         // properties
         public Guid ID { get; set; }
+        public int Version { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateLastUpdated { get; set; }
         public RequestStatus  Status { get; set; }
@@ -26,6 +27,7 @@ namespace Authorisations.Models
             DateCreated = DateTime.UtcNow;
             DateLastUpdated = DateCreated;
             ID = Guid.NewGuid();
+            Version = 1;
             Status = RequestStatus.New;
             Remarks = "";
             Command = Commands.NoOp;
