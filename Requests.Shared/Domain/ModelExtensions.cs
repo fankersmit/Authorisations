@@ -7,16 +7,18 @@ namespace Requests.Shared.Domain
 {
     public static class ModelExtensions
     {
-        public static byte[] SerializeToJson<TRequest>(this TRequest model)
+        public static byte[] SerializeToJson<TRequest>(this TRequest model, bool writeIndented = false)
         {
+#if DEBUG
+            var  _writeIndented = true;
+#else
+            var _writeIndented = writeIndented;
+#endif            
             var options = new JsonSerializerOptions
             {
-                WriteIndented = true,
-                Converters =
-                {
-                    new JsonStringEnumConverter()
-                }
+                WriteIndented = _writeIndented
             };
+            options.Converters.Add(new JsonStringEnumConverter());
             return JsonSerializer.SerializeToUtf8Bytes<TRequest>( model, options);
         }
         

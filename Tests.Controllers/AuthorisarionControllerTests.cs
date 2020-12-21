@@ -10,6 +10,7 @@ using Authorisations;
 using Requests.Shared;
 using FluentAssertions;
 using Requests.Domain;
+using Requests.Shared.Domain;
 using Tests.Helpers;
 
 namespace Tests.Controllers
@@ -32,7 +33,7 @@ namespace Tests.Controllers
             _fixture.StartRequestsApp();
         }
    
-       [Fact(Skip="fix  database first")]
+       [Fact(Skip="fix database first")]
        public void After_Submit_UnderConsideration_HasChanged()
         {
             // arrange
@@ -40,7 +41,7 @@ namespace Tests.Controllers
             var ruc = DeserializeJson<RequestsUnderConsideration>(response.Content).Result;
             
             var request = _requestFactory.CreateAccountRequest();
-            var body = Encoding.UTF8.GetString(request.ToJson()); 
+            var body = Encoding.UTF8.GetString(request.SerializeToJson()); 
             var content = new StringContent( body, Encoding.UTF8, "application/json");
  
             // act, submit request
@@ -62,7 +63,7 @@ namespace Tests.Controllers
         {
             // arrange
             var request = _requestFactory.CreateAccountRequest();
-            var body = Encoding.UTF8.GetString(request.ToJson()); 
+            var body = Encoding.UTF8.GetString(request.SerializeToJson()); 
             var content = new StringContent( body, Encoding.UTF8, "application/json");
             // act
             var response = await _client.PostAsync($"{_root}/request/submit/{route}", content);

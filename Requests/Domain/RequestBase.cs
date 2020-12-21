@@ -28,17 +28,7 @@ namespace Requests.Domain
         }
 
         // methods
-        public virtual byte[] ToJson()
-        {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-            options.Converters.Add(new JsonStringEnumConverter());
-            return JsonSerializer.SerializeToUtf8Bytes(this, options);   
-        }
-
-        public virtual bool Submit()
+         public virtual bool Submit()
         {
             if( !IsInValidState(ValidTransitions.Submit)) return false; 
             UpdateStatus(RequestStatus.Submitted);

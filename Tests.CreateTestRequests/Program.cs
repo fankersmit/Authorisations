@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Authorisations.Models;
+using Requests.Shared.Domain;
 using Tests.Helpers;
 
 
@@ -37,12 +38,12 @@ namespace Tests.CreateTestRequests
 
         private static string ConvertToJsonString(RequestModel model)
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-            options.Converters.Add(new JsonStringEnumConverter());
-            var json = JsonSerializer.SerializeToUtf8Bytes(model, options);
+#if DEBUG
+            const bool writeIndented = true;
+#else
+             const bool writeIndented = false;
+#endif
+            var json = model.SerializeToJson(writeIndented);
             return Encoding.UTF8.GetString(json);
         }
 
