@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Requests.Domain;
 using Requests.Shared.Domain;
+using RequestsApp.Domain;
 using RequestsApp.Infrastructure;
 using Tests.Helpers;
 using Xunit;
@@ -46,8 +47,9 @@ namespace Test.RequestApp
         public void CanInjectRequestHandlersIntoBroker()
         {
             // Arrange
+            var context = Fixture.Context;
             ICommandHandler requestHandler = new CommandHandler();
-            IQueryHandler queryHandler = new QueryHandler();
+            IQueryHandler queryHandler = new QueryHandler(context);
             using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
             var logger = loggerFactory.CreateLogger<RabbitMQServer>();
 
@@ -91,8 +93,9 @@ namespace Test.RequestApp
         RabbitMQServer CreateRMQServer()
         {
             // Arrange
+            var context = Fixture.Context;
             ICommandHandler requestHandler = new CommandHandler();
-            IQueryHandler queryHandler = new QueryHandler();
+            IQueryHandler queryHandler = new QueryHandler(context);
             using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
             var logger = loggerFactory.CreateLogger<RabbitMQServer>();
 

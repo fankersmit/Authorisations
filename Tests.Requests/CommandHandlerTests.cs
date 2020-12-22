@@ -5,6 +5,7 @@ using FluentAssertions;
 using Xunit;
 using Requests.Domain;
 using Requests.Shared.Domain;
+using RequestsApp.Domain;
 using RequestsApp.Infrastructure;
 using Tests.Helpers;
 
@@ -40,7 +41,6 @@ namespace Tests.Requests
             request.Version.Should().NotBe(version);
             request.Version.Should().Be(expected);
         }
-
        
         [Fact]
         public void CanHandleSubmittedRequest()

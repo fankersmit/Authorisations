@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -9,6 +12,7 @@ using Xunit;
 using Authorisations;
 using Requests.Shared;
 using FluentAssertions;
+using FluentAssertions.Extensions;
 using Requests.Domain;
 using Requests.Shared.Domain;
 using Tests.Helpers;
@@ -18,7 +22,7 @@ namespace Tests.Controllers
     public class AuthorisationsControllerTests : IClassFixture<RequestsAppFixture>, IClassFixture< WebApplicationFactory<Startup>> 
     {
         // fields
-        private readonly DomainTypesFactory _requestFactory;
+        private readonly ModelTypesFactory _requestModelsFactory;
         private readonly HttpClient _client;
         private readonly string _root = "api/authorisations";
         private RequestsAppFixture _fixture;
@@ -27,31 +31,36 @@ namespace Tests.Controllers
         public AuthorisationsControllerTests( RequestsAppFixture fixture, WebApplicationFactory<Startup> factory)
         {
             _client = factory.CreateClient();
-            _requestFactory = DomainTypesFactory.Instance;
+            _requestModelsFactory = ModelTypesFactory.Instance;
             // start requestApp if needed
             _fixture = fixture;
             _fixture.StartRequestsApp();
         }
    
-       [Fact(Skip="fix database first")]
-       public void After_Submit_UnderConsideration_HasChanged()
-        {
-            // arrange
-            var response = _client.GetAsync($"{_root}/requests/under-consideration/account").Result;
-            var ruc = DeserializeJson<RequestsUnderConsideration>(response.Content).Result;
+       [Fact]
+       public async void After_Submit_UnderConsideration_IsIncremented()
+       {
+            const string requestPath = "/requests/under-consideration/account";
+            const string submitPath = "/request/submit/account";
             
-            var request = _requestFactory.CreateAccountRequest();
+            // arrange
+            var response = await _client.GetAsync($"{_root}{requestPath}");
+            var content = await response.Content.ReadAsStringAsync();
+            var previousCount = JsonSerializer.Deserialize<Dictionary<string,int>>(content).Values.First();
+            
+            var request = _requestModelsFactory.CreateRequest();
             var body = Encoding.UTF8.GetString(request.SerializeToJson()); 
-            var content = new StringContent( body, Encoding.UTF8, "application/json");
+            var requestContent = new StringContent( body, Encoding.UTF8, "application/json");
  
             // act, submit request
-            var result =  _client.PostAsync($"{_root}/request/submit/account", content).Result;
+            var result = await  _client.PostAsync($"{_root}{submitPath}", requestContent);
             // get new under_consideration count
-            response = _client.GetAsync($"{_root}/requests/under-consideration/account").Result;
-            var newRuc = DeserializeJson<RequestsUnderConsideration>(response.Content).Result;
-
+            response = await _client.GetAsync($"{_root}{requestPath}");
+            content = await response.Content.ReadAsStringAsync();
+            var dict = JsonSerializer.Deserialize<Dictionary<string,int>>(content);
             // assert
-            newRuc.Count.Should().BeGreaterThan(ruc.Count); // one more items under consideration
+            int actualCount = dict.Values.First(); //only one item in collection
+            actualCount.Should().BeGreaterOrEqualTo(previousCount);
         }
 
         [Theory]
@@ -62,7 +71,7 @@ namespace Tests.Controllers
         public async Task Submit_ReturnsAccepted( string route, HttpStatusCode expected)
         {
             // arrange
-            var request = _requestFactory.CreateAccountRequest();
+            var request =  _requestModelsFactory.CreateRequest();
             var body = Encoding.UTF8.GetString(request.SerializeToJson()); 
             var content = new StringContent( body, Encoding.UTF8, "application/json");
             // act
@@ -83,27 +92,24 @@ namespace Tests.Controllers
         }
 
         [Theory]
-        [InlineData("", HttpStatusCode.OK, 0 )]
-        [InlineData("/account", HttpStatusCode.OK, 0 )]
+        [InlineData("", HttpStatusCode.OK, 19 )]
+        [InlineData("/account", HttpStatusCode.OK, 19 )]
         [InlineData("/product", HttpStatusCode.OK, 0 )]
         [InlineData("/organisation", HttpStatusCode.OK, 0 )]
         public async Task GetRequestUnderConsideration_Returns_SuccessAndCount(string route, HttpStatusCode statusCode, int count )
         {
             // arrange, act
             var response = await _client.GetAsync($"{_root}/requests/under-consideration{route}");
+            var content = await response.Content.ReadAsStringAsync();
+            var dict = JsonSerializer.Deserialize<Dictionary<string, int>>(content);
+
             // assert
-            try
-            {
-                response.EnsureSuccessStatusCode();
-            }
-            catch( HttpRequestException e )
-            {
-                Assert.False( 0==0, e.Message );
-            }
-            Assert.NotNull(response.Content);
-            Assert.Equal(statusCode, response.StatusCode);
-            var ruc = await DeserializeJson<RequestsUnderConsideration>(response.Content);
-            Assert.Equal(count, ruc.Count);
+            Action act = () => response.EnsureSuccessStatusCode(); 
+            act.Should().NotThrow<HttpRequestException>();
+            response.StatusCode.Should().Be(statusCode);
+            
+            int actualCount = dict.Values.First(); //only one item in collection
+            actualCount.Should().BeGreaterOrEqualTo(count);
         }
 
         [Fact]
@@ -139,9 +145,7 @@ namespace Tests.Controllers
         
         private class RequestsUnderConsideration
         {
-            public string requestType { get; set; }  
             public int Count { get; set; }
         }
-        
     }
 }

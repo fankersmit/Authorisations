@@ -5,6 +5,8 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using Requests.Domain;
+using Requests.Shared.Domain;
 using RequestsApp.Infrastructure;
 
 
@@ -32,6 +34,8 @@ namespace Tests.Helpers
            _logger = loggerFactory.CreateLogger<RequestDbContext>();
            
            _context = CreateInMemoryContext(_logger, contextOptions);
+           
+           AddRequestDocuments(3);
         }
 
         // methods
@@ -42,7 +46,19 @@ namespace Tests.Helpers
             context.Database.EnsureCreated();
             return context;
         }
-        
+
+        private void AddRequestDocuments( int numberToAdd)
+        {
+            for( var idx = 0; idx < numberToAdd; idx++)
+            {
+                var request = DomainTypesFactory.Instance.CreateAccountRequest();
+                var requestDocument = RequestDocumentFactory.Create(request, Commands.Submit);
+                _context.Add(requestDocument);
+            }
+            _context.SaveChanges();
+        }
+
+        // helper methods 
         private static DbConnection CreateInMemoryDatabaseConnection()
         {
             var connection = new SqliteConnection("Filename=:memory:");

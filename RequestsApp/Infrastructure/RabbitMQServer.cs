@@ -7,6 +7,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Requests.Domain;
 using Requests.Shared.Domain;
+using RequestsApp.Domain;
 
 namespace RequestsApp.Infrastructure
 {
@@ -78,7 +79,7 @@ namespace RequestsApp.Infrastructure
                 arguments: null);
 
             var consumer = new EventingBasicConsumer(channel);
-            consumer.Received += OnConsumerOnReceived;
+            consumer.Received += OnCommandReceived;
             channel.CallbackException += (chann, args) =>
             {
                 _logger.LogError(args.Exception, args.Exception.Message);
@@ -98,46 +99,48 @@ namespace RequestsApp.Infrastructure
             channel.BasicQos(0, 1, false);
             var consumer = new EventingBasicConsumer(channel);
             channel.BasicConsume(queue:queryHandlingQueueName, autoAck: false, consumer: consumer);
-
-            consumer.Received += (model, ea) =>
-            {
-                string response = null;
-                var body = ea.Body.ToArray();
-                var props = ea.BasicProperties;
-                var replyProps = channel.CreateBasicProperties();
-                replyProps.CorrelationId = props.CorrelationId;
-
-                try
-                {
-                    response = GetRequestsUnderConsideration(body).ToString();
-                    var message = Encoding.UTF8.GetString(body);
-                    _logger.LogInformation($"Received message {message} at {DateTime.UtcNow}");
-                }
-                catch (Exception e)
-                {
-                    if (e is ArgumentNullException || e is ArgumentException)
-                    {
-                        response = "";
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                finally
-                {
-                    var responseBytes = Encoding.UTF8.GetBytes(response);
-                    channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
-                        basicProperties: replyProps, body: responseBytes);
-                    channel.BasicAck(deliveryTag: ea.DeliveryTag,
-                        multiple: false);
-                }
-                _channels.Add(queryHandlingQueueName, channel);
-            };
-
+            consumer.Received += OnQueryReceived;
+            _channels.Add(queryHandlingQueueName, channel);
         }
 
-        private void OnConsumerOnReceived(object model, BasicDeliverEventArgs ea)
+        private void OnQueryReceived(object model, BasicDeliverEventArgs ea)
+        {
+            var channel = _channels[RequestsInfo_QueueName];
+            var replyProps = channel.CreateBasicProperties();
+            
+            string response = null;
+            var body = ea.Body.ToArray();
+            var props = ea.BasicProperties;
+            replyProps.CorrelationId = props.CorrelationId;
+            var message = Encoding.UTF8.GetString(body); 
+            _logger.LogInformation($"Received message {message} at {DateTime.UtcNow}");
+            
+            try
+            {
+                response = GetRequestsUnderConsideration(body).ToString();
+            }
+            catch (Exception e)
+            {
+                if (e is ArgumentNullException || e is ArgumentException)
+                {
+                    response = "";
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            finally
+            {
+                var responseBytes = Encoding.UTF8.GetBytes(response);
+                channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
+                    basicProperties: replyProps, body: responseBytes);
+                channel.BasicAck(deliveryTag: ea.DeliveryTag,
+                    multiple: false);
+            }
+        }
+
+        private void OnCommandReceived(object model, BasicDeliverEventArgs ea)
         {
             var body = ea.Body.ToArray();
             var requestBuilder = new RequestFromJsonBuilder(null);

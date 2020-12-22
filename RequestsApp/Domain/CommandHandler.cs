@@ -1,7 +1,8 @@
 using System;
+using Requests.Domain;
 using Requests.Shared.Domain;
 
-namespace Requests.Domain
+namespace RequestsApp.Domain
 {
     public class CommandHandler : ICommandHandler
     {
@@ -17,18 +18,35 @@ namespace Requests.Domain
 
             switch (command)
             {
+                case Commands.NoOp:
+                    break;
                 case Commands.Submit:
                     retval = request.Submit();
-
-                    if (retval == true)
-                    {
-                        // inform interested parties like database                        
-                        RaiseCommandHandledEvent( request, command);
-                    }
                     break;
-
-                default:
+                case Commands.Cancel:
+                    retval = request.Cancel();
                     break;
+                case Commands.Confirm:
+                    retval = request.Confirm();
+                    break;                    
+                case Commands.Approve:
+                    retval = request.Approve();
+                    break;
+                case Commands.Disapprove:
+                    retval = request.Disapprove();
+                    break;
+                case Commands.Conclude:
+                    retval = request.Conclude();
+                    break;
+                case Commands.Remove:
+                    retval = request.Remove();
+                    break;
+            }
+            
+            if (retval == true)
+            {
+                // inform interested parties like database                        
+                RaiseCommandHandledEvent( request, command);
             }
             return retval;
         }

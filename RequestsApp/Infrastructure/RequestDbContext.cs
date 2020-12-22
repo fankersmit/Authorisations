@@ -34,13 +34,14 @@ namespace RequestsApp.Infrastructure
 
         public void OnCommandExecuted(object sender, CommandHandledEventArgs eventArgs)
         {
-            // create document
+            // rerieve document from eventArgs 
             var requestDocument = RequestDocumentFactory.Create(eventArgs.Request, eventArgs.CommandHandled);
             var Id = requestDocument.ID;
             var version = requestDocument.Version;
-            if (IsAlreadyAdded(Id, version))
+            // store, if not already present
+            if (DocumentIsAlreadyAdded(Id, version))
             {
-                _logger.Log(LogLevel.Information,$"Skipped adding request with ID:{Id} and version:{version}");
+                _logger.Log(LogLevel.Information,$"Skipped adding request again with ID:{Id} and version:{version}");
                 return;
             }
         
@@ -48,7 +49,7 @@ namespace RequestsApp.Infrastructure
             this.SaveChanges();
         }
 
-        private bool IsAlreadyAdded(Guid Id, int version)
+        private bool DocumentIsAlreadyAdded(Guid Id, int version)
         {
             var local = this.Set<RequestDocument>()
                 .Local

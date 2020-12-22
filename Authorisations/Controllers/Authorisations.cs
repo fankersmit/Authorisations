@@ -47,8 +47,8 @@ namespace Authorisations.Controllers
         [HttpGet]
         [Route("requests/under-consideration")]
         [Route("requests/under-consideration/{requestType}")]
-        [ProducesResponseType(typeof(Dictionary<string,string>),StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Dictionary<string,string>),StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Dictionary<string,int>),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Dictionary<string,int>),StatusCodes.Status400BadRequest)]
         public object RequestsUnderConsideration(string? requestType)
         {
             string underConsideration;
@@ -68,10 +68,12 @@ namespace Authorisations.Controllers
             // put request on queue
             var messageBytes = Encoding.UTF8.GetBytes(underConsideration);
             var result = _client.Call(messageBytes);
-            var response  = new Dictionary<string,string> {{ underConsideration, result}};
+            int count = Convert.ToInt32(result);
+            var response  = new Dictionary<string,int> {{ underConsideration, count}};
             return response;
         }
- #nullable disable       
+ #nullable disable    
+        
         [HttpGet]
         [ProducesResponseType(typeof(Dictionary<string,string>), StatusCodes.Status200OK)]
         public object Get()

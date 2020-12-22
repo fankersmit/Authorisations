@@ -1,7 +1,8 @@
 using System;
+using Requests.Domain;
 using Requests.Shared.Domain;
 
-namespace Requests.Domain
+namespace RequestsApp.Domain
 {
     public interface ICommandHandler
     {

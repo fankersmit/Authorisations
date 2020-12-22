@@ -1,6 +1,6 @@
 using Requests.Shared.Domain;
 
-namespace Requests.Domain
+namespace RequestsApp.Domain
 {
     public interface IQueryHandler
     {

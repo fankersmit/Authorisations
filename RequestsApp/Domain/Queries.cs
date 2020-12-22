@@ -1,4 +1,4 @@
-namespace Requests.Domain
+namespace RequestsApp.Domain
 {
     public enum Queries
     {

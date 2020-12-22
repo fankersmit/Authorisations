@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Requests.Domain;
+using RequestsApp.Domain;
 using RequestsApp.Infrastructure;
 
 namespace RequestsApp
@@ -42,7 +43,7 @@ namespace RequestsApp
                 .AddDbContext<RequestDbContext>(
        (serviceProvider, options) =>
                         options.UseSqlite(connectionString)
-                               .UseInternalServiceProvider(serviceProvider));
+                               .UseInternalServiceProvider(serviceProvider),ServiceLifetime.Transient);
         }
 
         private string  GetConnectionString()
