@@ -5,7 +5,7 @@ using Authorisations.Models;
 using Requests.Shared.Domain;
 using Xunit;
 
-namespace Tests.Controllers
+namespace Tests.Authorisations
 {
     public class RequestTypeTests
     {

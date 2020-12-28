@@ -42,7 +42,7 @@ namespace RequestsApp
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<RequestDbContext>(
        (serviceProvider, options) =>
-                        options.UseSqlite(connectionString)
+                        options.UseSqlite(GetConnectionString())
                                .UseInternalServiceProvider(serviceProvider),ServiceLifetime.Transient);
         }
 

@@ -164,7 +164,7 @@ namespace Tests.Requests
         public void Disapproved_Can_Only_Change_ToNext_ValidStates(int commandIndex, bool hasNewState)
         {
             // arrange 
-            var request = CreateTestRequestWthStatus(RequestStatus.Disapproved);
+            var request = CreateTestRequestWthStatus(RequestStatus.Rejected);
             var transitions = GetRequestCommands(request);
             var originalState = request.Status;
             // act, execute each command
@@ -248,7 +248,7 @@ namespace Tests.Requests
                     request.Confirm();
                     request.Approve();
                     break;
-                case RequestStatus.Disapproved:
+                case RequestStatus.Rejected:
                     request.Confirm();
                     request.Disapprove();
                     break;

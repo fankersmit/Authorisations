@@ -5,7 +5,7 @@ using Tests.Helpers;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Tests.Controllers
+namespace Tests.Authorisations
 {
     public class ModelTests
     {

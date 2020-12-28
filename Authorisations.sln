@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorisations", "Authorisations\Authorisations.csproj", "{4744F5CD-DC2A-4D2B-B318-507576C1AB7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Controllers", "Tests.Controllers\Tests.Controllers.csproj", "{2C98F092-5EC8-45D2-B459-86740E85A0B6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Authorisations", "Tests.Authorisations\Tests.Authorisations.csproj", "{2C98F092-5EC8-45D2-B459-86740E85A0B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestsApp", "RequestsApp\RequestsApp.csproj", "{9C8ABB7D-C145-4E44-8671-4644B6F9851B}"
 EndProject

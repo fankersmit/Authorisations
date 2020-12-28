@@ -20,7 +20,7 @@ namespace Authorisations.Infrastructure
         
         // rpc channel
         private EventingBasicConsumer _rpcConsumer;
-        private BlockingCollection<string> _respQueue = new BlockingCollection<string>();
+        private BlockingCollection<byte[]> _respQueue = new BlockingCollection<byte[]>();
         private IBasicProperties _props;
         private const string _rpcQueueName = "rpc_queue";
         
@@ -55,17 +55,17 @@ namespace Authorisations.Infrastructure
             _channels.Add(publishQueueName, channel);
         }
 
-        private EventingBasicConsumer CreateRpcConsumer(IModel channel, IBasicProperties props, BlockingCollection<string> respQueue )
+        private EventingBasicConsumer CreateRpcConsumer(IModel channel, IBasicProperties props, BlockingCollection<byte[]> respQueue )
         {
             var consumer = new EventingBasicConsumer(channel);
             var correlationId = props.CorrelationId;
             consumer.Received += (model, ea) =>
             {
                 var body = ea.Body.ToArray();
-                var response = Encoding.UTF8.GetString(body);
+                //var response = Encoding.UTF8.GetString(body);
                 if (ea.BasicProperties.CorrelationId == correlationId)
                 {
-                    respQueue.Add(response);
+                    respQueue.Add(body);
                 }
             };
             return consumer;
@@ -79,25 +79,30 @@ namespace Authorisations.Infrastructure
             _channels.Add(queueName, channel);
             // create props for consumer
             var props = channel.CreateBasicProperties();
-            props.CorrelationId = Guid.NewGuid().ToString();
+            //props.CorrelationId = Guid.NewGuid().ToString();
             props.ReplyTo = replyQueueName;
             return props;
         }   
         
-        public string Call(byte[]  messageBytes )
+        public byte[] Call(byte[]  messageBytes )
         {
+            var props = _channels[_rpcQueueName].CreateBasicProperties();
+
+            // every call needs unique correlation ID
+            props.CorrelationId = Guid.NewGuid().ToString();
+            props.ReplyTo =  "amq.rabbitmq.reply-to";
+
            _channels[ _rpcQueueName].BasicPublish(
                 "",
                 routingKey:  _rpcQueueName,
-                basicProperties: _props,
+                basicProperties: props,
                 body: messageBytes);
 
-            _channels[ _rpcQueueName].BasicConsume(
+           _channels[ _rpcQueueName].BasicConsume(
                 consumer: _rpcConsumer,
-                queue: _props.ReplyTo,
+                queue: "amq.rabbitmq.reply-to",
                 autoAck: true);
-
-            return _respQueue.Take();
+           return _respQueue.Take();
         }
         
         public void Post( byte[] message )

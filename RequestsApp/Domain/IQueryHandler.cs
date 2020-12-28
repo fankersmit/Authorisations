@@ -1,10 +1,10 @@
+using System.Collections.Generic;
 using Requests.Shared.Domain;
 
 namespace RequestsApp.Domain
 {
     public interface IQueryHandler
     {
-        public int RequestsUnderConsideration(RequestType requestType);
-        public int AllRequestsUnderConsideration();
+        public byte[] QueryFor(Queries query, Dictionary<string, string> args);
     }
 }

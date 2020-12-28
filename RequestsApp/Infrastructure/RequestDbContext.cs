@@ -8,7 +8,6 @@ using Requests.Shared.Domain;
 
 namespace RequestsApp.Infrastructure
 {
-    
     public class RequestDbContext : DbContext
     {
         private readonly ILogger<RequestDbContext> _logger; 

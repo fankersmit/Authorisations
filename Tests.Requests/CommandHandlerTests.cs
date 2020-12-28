@@ -11,17 +11,17 @@ using Tests.Helpers;
 
 namespace Tests.Requests
 {
-    public class CommandHandlerTests : IClassFixture<SqliteInMemoryFixture>
+    public class CommandHandlerTests
     {
         // properties
         public DomainTypesFactory Factory { get; }
         public SqliteInMemoryFixture Fixture { get; }
 
         // ctors
-        public CommandHandlerTests(SqliteInMemoryFixture fixture)
+        public CommandHandlerTests()
         {
             Factory = DomainTypesFactory.Instance;
-            Fixture = fixture;
+            Fixture = new SqliteInMemoryFixture();
         }
 
         [Fact]

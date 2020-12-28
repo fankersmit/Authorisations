@@ -14,6 +14,10 @@ namespace Tests.Helpers
         public RequestsAppFixture()
         {
             Started = ProcessChecker.IsRunning(_processName);
+            if (!Started)
+            {
+                StartRequestsApp();
+            }
         }
         
         public void StartRequestsApp()
@@ -51,7 +55,7 @@ namespace Tests.Helpers
 
         ~RequestsAppFixture()
         {
-            ReleaseUnmanagedResources();
+            Dispose();
         }
     }
 }

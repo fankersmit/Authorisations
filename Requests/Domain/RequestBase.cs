@@ -63,7 +63,7 @@ namespace Requests.Domain
         public virtual bool Disapprove()
         {
             if( !IsInValidState(ValidTransitions.Disapprove)) return false; 
-            UpdateStatus(RequestStatus.Disapproved);
+            UpdateStatus(RequestStatus.Rejected);
             return true;
         }
 

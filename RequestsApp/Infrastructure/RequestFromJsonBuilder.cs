@@ -8,8 +8,6 @@ using Requests.Shared.Domain;
 
 namespace RequestsApp.Infrastructure
 {
-    public delegate T GetValueFromJsonElement<T> (JsonElement jsonElement, string propertyName); 
-        
     public class RequestFromJsonBuilder
     {
         // fields  
@@ -35,7 +33,7 @@ namespace RequestsApp.Infrastructure
                 switch (t.Name)
                 {
                     // Status
-                    case "Status":
+                    case "RequestStatus":
                         string enumValue = jsonRequest.GetProperty(property.Name).GetString();
                         property.SetValue(request, Enum.Parse<RequestStatus>(enumValue));
                         break;
@@ -195,5 +193,3 @@ namespace RequestsApp.Infrastructure
         }
     }
 }
-
-       

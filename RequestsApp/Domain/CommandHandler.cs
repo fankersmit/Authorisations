@@ -6,8 +6,11 @@ namespace RequestsApp.Domain
 {
     public class CommandHandler : ICommandHandler
     {
+        // events
+        public event EventHandler<CommandHandledEventArgs> CommandHandled;
+
         // ctors
-        public CommandHandler()
+        public CommandHandler( )
         {
         }
 
@@ -65,8 +68,5 @@ namespace RequestsApp.Domain
                 eventHandler(this, eventArgs);
             }
         }
-
-        // events
-        public event EventHandler<CommandHandledEventArgs> CommandHandled;
     }
 }

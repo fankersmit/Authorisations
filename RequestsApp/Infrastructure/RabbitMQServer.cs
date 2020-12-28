@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -17,8 +18,8 @@ namespace RequestsApp.Infrastructure
         private const string RequestsInfo_QueueName = "rpc_queue";
         private const string RequestHandling_QueueName = "publish_queue";
         
-        private readonly ICommandHandler _commandHandler;
-        private readonly IQueryHandler _queryHandler;
+        private ICommandHandler _commandHandler;
+        private IQueryHandler _queryHandler;
         private readonly ILogger _logger;
         private readonly IConnection _connection;
         private readonly ConnectionFactory _connectionFactory;
@@ -29,26 +30,22 @@ namespace RequestsApp.Infrastructure
         public IQueryHandler QueryHandler => _queryHandler;
 
         // ctors
-        public RabbitMQServer( ILogger<RabbitMQServer> logger, ICommandHandler commandHandler, IQueryHandler  queryHandler)
+        public RabbitMQServer( ILogger<RabbitMQServer> logger)
         {
             _logger = logger;
-            _commandHandler = commandHandler;
-            _queryHandler = queryHandler;
             _channels = new Dictionary<string, IModel>();
             _connectionFactory = new ConnectionFactory() { HostName = "localhost" };
             _connection = _connectionFactory.CreateConnection();
         }
 
-        public void Run( RequestDbContext context )
+        public void Run( ICommandHandler commandHandler, IQueryHandler queryHandler)
         {
-            // wire up event handling
-            _commandHandler.CommandHandled += context.OnCommandExecuted;
-            
-            CreateChannels(); 
+             CreateChannels();
+             _commandHandler = commandHandler;
+             _queryHandler = queryHandler;
             _logger.LogInformation("Started Server at {dateTime}", DateTime.UtcNow);
         }
-        
-        
+
         public void Stop()
         {
             foreach( KeyValuePair<string, IModel> entry in  _channels)
@@ -98,7 +95,7 @@ namespace RequestsApp.Infrastructure
                 exclusive: false, autoDelete: false, arguments: null);
             channel.BasicQos(0, 1, false);
             var consumer = new EventingBasicConsumer(channel);
-            channel.BasicConsume(queue:queryHandlingQueueName, autoAck: false, consumer: consumer);
+            channel.BasicConsume(queue:queryHandlingQueueName, autoAck: true, consumer: consumer);
             consumer.Received += OnQueryReceived;
             _channels.Add(queryHandlingQueueName, channel);
         }
@@ -107,37 +104,26 @@ namespace RequestsApp.Infrastructure
         {
             var channel = _channels[RequestsInfo_QueueName];
             var replyProps = channel.CreateBasicProperties();
-            
-            string response = null;
             var body = ea.Body.ToArray();
             var props = ea.BasicProperties;
             replyProps.CorrelationId = props.CorrelationId;
-            var message = Encoding.UTF8.GetString(body); 
+            var message = Encoding.UTF8.GetString(body);
             _logger.LogInformation($"Received message {message} at {DateTime.UtcNow}");
             
-            try
-            {
-                response = GetRequestsUnderConsideration(body).ToString();
-            }
-            catch (Exception e)
-            {
-                if (e is ArgumentNullException || e is ArgumentException)
-                {
-                    response = "";
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                var responseBytes = Encoding.UTF8.GetBytes(response);
-                channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
-                    basicProperties: replyProps, body: responseBytes);
-                channel.BasicAck(deliveryTag: ea.DeliveryTag,
-                    multiple: false);
-            }
+            var queryDict = JsonSerializer.Deserialize<Dictionary<string, string>>(body);
+            var query = Enum.Parse<Queries>(queryDict["Query"]);
+            var args = queryDict
+                .Where(s => s.Key != "Query")
+                .ToDictionary(d => d.Key, d => d.Value);
+            // Perform the query
+             var responseBytes = _queryHandler.QueryFor(query, args);
+
+            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
+                basicProperties: replyProps, body: responseBytes);
+            channel.BasicAck(deliveryTag: ea.DeliveryTag,
+                multiple: false);
+            // note the format specifier
+            _logger.LogInformation($"handled {query:g} query at {DateTime.UtcNow}");
         }
 
         private void OnCommandReceived(object model, BasicDeliverEventArgs ea)
@@ -150,23 +136,5 @@ namespace RequestsApp.Infrastructure
             _commandHandler.Handle(request, command);
             _logger.LogInformation($"handled {command.ToString()} command for request with ID {request.ID} at {DateTime.UtcNow}");
         }
-        
-        private int GetRequestsUnderConsideration(byte[] body)
-        {
-            int requestCount;
-            var message = Encoding.UTF8.GetString(body);
-            var requestType = message.Substring(message.IndexOf('-')+1);
-            if ( Enum.TryParse<RequestType>(requestType, true, out var rt))
-            {
-                 requestCount = _queryHandler.RequestsUnderConsideration( rt ); 
-            }
-            else
-            {
-                requestCount = _queryHandler.AllRequestsUnderConsideration();                      
-            }
-            _logger.LogInformation($"handled {requestType} query at {DateTime.UtcNow}");
-            return requestCount;
-        }
-        
     }
 }
