@@ -23,7 +23,11 @@ namespace Authorisations
         {
             services.AddControllers();
             services.AddLogging(configure => configure.AddConsole());
-            services.AddSingleton<RabbitMqClient>();
+            services.AddSingleton<RabbitMqDefaultClient>();
+            services.AddSingleton<RabbitMqRpcClient>();
+
+            // allow for graceful shutdown
+            services.Configure<HostOptions>(Configuration.GetSection("HostOptions"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,6 +38,7 @@ namespace Authorisations
                 app.UseDeveloperExceptionPage();
             }
             app.UseRabbitRpcClient();
+            app.UseRabbitDefaultClient();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();

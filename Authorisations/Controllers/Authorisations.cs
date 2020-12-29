@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Net.Mime;
-using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,14 +18,16 @@ namespace Authorisations.Controllers
     public class AuthorisationsController : ControllerBase
     {
         private readonly ILogger<AuthorisationsController> _logger;
-        private readonly RabbitMqClient _client;
+        private readonly RabbitMqDefaultClient _defaultClient;
+        private readonly RabbitMqRpcClient _rpcClient;
         private readonly QueryBuilder _queryBuilder;
 
         public AuthorisationsController(ILogger<AuthorisationsController> logger,
-            RabbitMqClient rabbitMqClient)
+            RabbitMqDefaultClient rabbitMqDefaultClient, RabbitMqRpcClient rabbitMqRpcClient)
         {
             _logger = logger;
-            _client = rabbitMqClient;
+            _defaultClient = rabbitMqDefaultClient;
+            _rpcClient = rabbitMqRpcClient;
             _queryBuilder = new QueryBuilder();
         }
 
@@ -37,7 +38,7 @@ namespace Authorisations.Controllers
         {
             request.Command = Commands.Submit;
             var content = request.SerializeToJson();
-            _client.Post(content);
+            _defaultClient.Post(content);
             _logger.LogInformation("Submitted posted request to RMQ client");
             return Accepted();
         }
@@ -58,10 +59,10 @@ namespace Authorisations.Controllers
             {
                 if (!RequestTypeChecker.IsKnownRequestType(requestType))
                 {
+                    // TODO: add failure message
                     return BadRequest();
                 }
-
-                underConsideration = requestType;
+                underConsideration = ToTitleCase(requestType);
             }
             else
             {
@@ -70,12 +71,10 @@ namespace Authorisations.Controllers
             }
 
             var query = _queryBuilder.BuildQueryFor(Queries.UnderConsideration, underConsideration);
-            // put request on queue
-            var messageBytes = query.AsUTF8Bytes;
-            var result = _client.Call(messageBytes);
-            int count = Convert.ToInt32(result);
-            var response = new Dictionary<string, int> {{underConsideration, count}};
-            return response;
+            var result = _rpcClient.Call(query.AsUTF8Bytes);
+            var responseObject = JsonSerializer.Deserialize<Dictionary<string, string>>(result);
+            _logger.LogInformation( $"Query {underConsideration} executed at: {DateTime.UtcNow}");
+            return Ok(responseObject);
         }
 
         [HttpGet]
@@ -84,12 +83,11 @@ namespace Authorisations.Controllers
         public object Ping()
         {
             var query = _queryBuilder.BuildQueryFor(Queries.Ping, "");
-            query.Add("Webserver", "Up");
-            var result = _client.Call(query.AsUTF8Bytes);
+            var result = _rpcClient.Call(query.AsUTF8Bytes);
             var responseObject = JsonSerializer.Deserialize<Dictionary<string, string>>(result);
-            query.Arguments.Concat(responseObject);
+            responseObject.Add("Webserver", "Up");
             _logger.LogInformation( $"Status pinged at: {DateTime.UtcNow}");
-            return query;
+            return Ok(responseObject); //200
         }
 
         [HttpGet]
@@ -102,13 +100,17 @@ namespace Authorisations.Controllers
             // check if it is a Guid
             if (!Guid.TryParse(requestId, out var guidRequestID))
             {
-                return BadRequest(); // 400
+                var response = new Dictionary<string, string>() {
+                    { "Query", "CurrentStatus"},
+                    { "ID", requestId  },
+                    { "Failure", $"the provided request Id: {requestId} is not a valid Guid."}
+                };
+                return BadRequest(response); // 400
             }
 
             var query = _queryBuilder.BuildQueryFor(Queries.CurrentStatus, guidRequestID);
             // put request on queue
-            var result = _client.Call(query.AsUTF8Bytes);
-
+            var result = _rpcClient.Call(query.AsUTF8Bytes);
             var responseObject = JsonSerializer.Deserialize<Dictionary<string, string>>(result);
             if (responseObject.ContainsKey("Failure"))
             {
@@ -118,5 +120,13 @@ namespace Authorisations.Controllers
             _logger.LogInformation($"Status requested for : {requestId}");
             return Ok(responseObject); // 200
         }
+
+        // private helper mthods
+        string ToTitleCase(string toConvert)
+        {
+            var upr = toConvert.ToUpper()[0];
+            return  $"{upr}{toConvert.Substring(1)}";
+        }
+
     }
 }

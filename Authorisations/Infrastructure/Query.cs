@@ -23,12 +23,12 @@ namespace Authorisations.Infrastructure
             }
         }
 
-        public byte[] AsUTF8Bytes => JsonSerializer.SerializeToUtf8Bytes(_queryEntries);
+        public byte[] AsUTF8Bytes => _queryEntries.SerializeToJson();
 
         // ctors
         private Query()
         {
-            _queryEntries = new Dictionary<string, string>();     
+            _queryEntries = new Dictionary<string, string>();
         }
         
         public Query( Queries type ) : this()

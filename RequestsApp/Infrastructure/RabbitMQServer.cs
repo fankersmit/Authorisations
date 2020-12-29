@@ -15,7 +15,7 @@ namespace RequestsApp.Infrastructure
     public class RabbitMQServer
     {
         private const string HostName = "localhost";
-        private const string RequestsInfo_QueueName = "rpc_queue";
+        private const string RequestsInfo_QueueName = "auth_rpc_queue";
         private const string RequestHandling_QueueName = "publish_queue";
         
         private ICommandHandler _commandHandler;
@@ -95,8 +95,8 @@ namespace RequestsApp.Infrastructure
                 exclusive: false, autoDelete: false, arguments: null);
             channel.BasicQos(0, 1, false);
             var consumer = new EventingBasicConsumer(channel);
-            channel.BasicConsume(queue:queryHandlingQueueName, autoAck: true, consumer: consumer);
             consumer.Received += OnQueryReceived;
+            channel.BasicConsume(queue:queryHandlingQueueName, autoAck: true, consumer: consumer);
             _channels.Add(queryHandlingQueueName, channel);
         }
 
@@ -118,10 +118,11 @@ namespace RequestsApp.Infrastructure
             // Perform the query
              var responseBytes = _queryHandler.QueryFor(query, args);
 
-            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
-                basicProperties: replyProps, body: responseBytes);
-            channel.BasicAck(deliveryTag: ea.DeliveryTag,
-                multiple: false);
+            channel.BasicPublish(
+                exchange: "",
+                routingKey: props.ReplyTo,
+                basicProperties: replyProps,
+                body: responseBytes);
             // note the format specifier
             _logger.LogInformation($"handled {query:g} query at {DateTime.UtcNow}");
         }

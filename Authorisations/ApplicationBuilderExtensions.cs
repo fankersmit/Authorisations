@@ -8,30 +8,57 @@ namespace Authorisations
     public static class ApplicationBuilderExtensions
     {
         //store a single long-living object
-        private static RabbitMqClient Client { get; set; }
+        private static RabbitMqDefaultClient DefaultClient { get; set; }
 
-        public static IApplicationBuilder UseRabbitRpcClient(this IApplicationBuilder app)
+        public static IApplicationBuilder UseRabbitDefaultClient(this IApplicationBuilder app)
         {
-            Client = app.ApplicationServices.GetService<RabbitMqClient>();
+            DefaultClient = app.ApplicationServices.GetService<RabbitMqDefaultClient>();
 
             var lifetime = app.ApplicationServices.GetService<IHostApplicationLifetime>();
 
-            lifetime.ApplicationStarted.Register(OnStarted);
+            lifetime.ApplicationStarted.Register(OnDefaultStarted);
 
             //press Ctrl+C to reproduce if your app runs in Kestrel as a console app
-            lifetime.ApplicationStopping.Register(OnStopping);
+            lifetime.ApplicationStopping.Register(OnDefaultStopping);
 
             return app;
         }
 
-        private static void OnStarted()
+        //store a single long-living object
+        private static RabbitMqRpcClient RpcClient { get; set; }
+
+        public static IApplicationBuilder UseRabbitRpcClient(this IApplicationBuilder app)
         {
-            Client.Register();
+            RpcClient = app.ApplicationServices.GetService<RabbitMqRpcClient>();
+
+            var lifetime = app.ApplicationServices.GetService<IHostApplicationLifetime>();
+
+            lifetime.ApplicationStarted.Register(OnRpcStarted);
+
+            //press Ctrl+C to reproduce if your app runs in Kestrel as a console app
+            lifetime.ApplicationStopping.Register(OnRpcStopping);
+
+            return app;
         }
 
-        private static void OnStopping()
+        private static void OnRpcStarted()
         {
-            Client.Deregister();    
+            RpcClient.Register();
+        }
+
+        private static void OnRpcStopping()
+        {
+            RpcClient.Deregister();
+        }
+
+        private static void OnDefaultStarted()
+        {
+            DefaultClient.Register();
+        }
+
+        private static void OnDefaultStopping()
+        {
+            DefaultClient.Deregister();
         }
     }
 }

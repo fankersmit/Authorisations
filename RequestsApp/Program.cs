@@ -27,8 +27,9 @@ namespace RequestsApp
                 ICommandHandler commandHandler = startup.Provider.GetRequiredService<ICommandHandler>();
                 IQueryHandler queryHandler = startup.Provider.GetRequiredService<IQueryHandler>();
                 // wire up event handling
-                var queryContext = startup.Provider.GetRequiredService<RequestDbContext>();
-                commandHandler.CommandHandled += queryContext.OnCommandExecuted;
+                var commandContext = startup.Provider.GetRequiredService<RequestDbContext>();
+                commandHandler.CommandHandled += commandContext.OnCommandExecuted;
+                // wire up handlers
                 service.Run(commandHandler, queryHandler);
             }
             catch ( InvalidOperationException ioe)

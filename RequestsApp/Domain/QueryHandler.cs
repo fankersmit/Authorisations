@@ -51,7 +51,7 @@ namespace RequestsApp.Domain
                         }
                         catch (ArgumentException e)
                         {
-                            queryResult = BuildFailureResponse(args["ID"], e);
+                            queryResult = BuildFailureResponse(query, args["ID"], e);
                         }
                         break;
 
@@ -61,7 +61,7 @@ namespace RequestsApp.Domain
                     // query total number of requests being processed, but not finished
                     case Queries.UnderConsideration:
                         var count  = GetRequestsUnderConsideration(args["Type"]);
-                        queryResult = BuildUnderConsiderationResponse(count);
+                        queryResult = BuildUnderConsiderationResponse(args["Type"], count);
                         break;
 
                     // query for all requests with a certain status
@@ -78,11 +78,12 @@ namespace RequestsApp.Domain
             return queryResult;
         }
 
-        private byte[] BuildUnderConsiderationResponse(int count)
+        private byte[] BuildUnderConsiderationResponse(string requestType, int count)
         {
             var resultsDict = new Dictionary<string, string>
             {
-                { "Type", "Äll"},
+                { "Query", "UnderConsideration" },
+                { "Type", requestType },
                 { "Count", count.ToString()}
             };
             return JsonSerializer.SerializeToUtf8Bytes(resultsDict);
@@ -92,9 +93,10 @@ namespace RequestsApp.Domain
         {
             var resultsDict = new Dictionary<string, string>
             {
-                { "Broker", "Up"},
+                { "Query", "Ping" },
+                { "Store" , "Up" },
                 { "RequestHandler", "Up"},
-                { "Store" , "Up" }
+                { "Broker", "Up"}
             };
             return JsonSerializer.SerializeToUtf8Bytes(resultsDict);
         }
@@ -109,10 +111,11 @@ namespace RequestsApp.Domain
             return JsonSerializer.SerializeToUtf8Bytes(resultsDict);
         }
 
-        private byte[]  BuildFailureResponse( string requestID, ArgumentException exception )
+        private byte[]  BuildFailureResponse( Queries query, string requestID, ArgumentException exception )
         {
             var resultsDict = new Dictionary<string, string>
             {
+                {"Query", query.ToString()},
                 {"ID", requestID},
                 {"Failure",  $"{exception.Message}"}
             };
@@ -140,12 +143,6 @@ namespace RequestsApp.Domain
         } 
 
         // TODO: implement querying for  organisation and product requests
-        public int RequestsUnderConsideration(RequestType requestType)
-        {
-            return _context.RequestDocuments.Count(
-                p => _commandsIncluded.Contains(p.Command));
-        }
-
         // argument is ignored for now, we return all
         public int GetRequestsUnderConsideration( string requestType )
         {

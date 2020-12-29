@@ -80,7 +80,7 @@ namespace Tests.Authorisations
         {
         }
         */
-#region tests to redesign
+
         [Theory]
         [InlineData("f9782b64-a7f5-46f1-84ec-d58e5e0de030")]
         [InlineData("10b79e1f-60b4-48a8-8697-08349a16dea7")]
@@ -88,14 +88,25 @@ namespace Tests.Authorisations
         public async Task Query_Returns_NotFound_For_NonExisting_ID(string requestId)
         {
             // arrange
+            var expectedKeys = new  string[] {"Query" , "ID" , "Failure" };
+            var expectedCount = expectedKeys.Length;
             var expected = HttpStatusCode.NotFound;
+
             // act
             var response = await _client.GetAsync($"{_root}/request/{requestId}/status");
+            var body = await response.Content.ReadAsStringAsync();
+            var resultDict = JsonSerializer.Deserialize<Dictionary<string,string>>(body);
+
             // assert
             Assert.Equal(expected, response.StatusCode);
+            Assert.NotNull(response.Content);
+            resultDict.Count.Should().Be(expectedCount);
+            foreach (var expectedKey in expectedKeys)
+            {
+                resultDict.ContainsKey(expectedKey).Should().BeTrue();
+            }
         }
 
-        // TODO
         [Theory]
         [InlineData("f9782b64-a7f5-46f1-84ecd58e5e0de030")]
         [InlineData("10b79e1f-60b4-48a8-8697-08349a6dea7")]
@@ -104,12 +115,25 @@ namespace Tests.Authorisations
         {
             // arrange
             var expected = HttpStatusCode.BadRequest;
+            var expectedKeys = new  string[] {"Query" , "ID" , "Failure" };
+            var expectedCount = expectedKeys.Length;
+
             // act
             var response = await _client.GetAsync($"{_root}/request/{requestId}/status");
+            var body = await response.Content.ReadAsStringAsync();
+            var resultDict = JsonSerializer.Deserialize<Dictionary<string,string>>(body);
+
             // assert
             Assert.Equal(expected, response.StatusCode);
+            Assert.NotNull(response.Content);
+            resultDict.Count.Should().Be(expectedCount);
+            foreach (var expectedKey in expectedKeys)
+            {
+                resultDict.ContainsKey(expectedKey).Should().BeTrue();
+            }
         }
 
+#region tests to redesign
         [Fact(Skip="redesign needed")]
         public async Task After_Submit_UnderConsideration_IsIncremented()
        {
@@ -163,28 +187,38 @@ namespace Tests.Authorisations
             // assert
             Assert.Equal(expected, response.StatusCode);
         }
-
-        [Theory(Skip="redesign needed")]
-        [InlineData("", HttpStatusCode.OK, 19 )]
-        [InlineData("/account", HttpStatusCode.OK, 19 )]
-        [InlineData("/product", HttpStatusCode.OK, 0 )]
-        [InlineData("/organisation", HttpStatusCode.OK, 0 )]
-        public async Task GetRequestUnderConsideration_Returns_SuccessAndCount(string route, HttpStatusCode statusCode, int count )
+        #endregion
+        [Theory]
+        [InlineData("", HttpStatusCode.OK, "All", 19 )]
+        [InlineData("/account", HttpStatusCode.OK, "Account", 19 )]
+        [InlineData("/product", HttpStatusCode.OK, "Product",0 )]
+        [InlineData("/organisation", HttpStatusCode.OK, "Organisation", 0 )]
+        public async Task Query_UnderConsideration_Returns_OKAndCount(
+            string route, HttpStatusCode statusCode, string requestType, int count )
         {
-            // arrange, act
-            var response = await _client.GetAsync($"{_root}/requests/under-consideration{route}");
-            var content = response.Content.ReadAsStringAsync().Result;
-            var dict = JsonSerializer.Deserialize<Dictionary<string, int>>(content);
+            // arrange
+            var expectedKeys = new  string[] {"Query" , "Type" , "Count" };
+            var expectedCount = expectedKeys.Length;
+
+            // act
+            var response = await _client.GetAsync($"{_root}/requests/under-consideration{route}/count");
+            var content = await response.Content.ReadAsStringAsync();
+            var resultDict = JsonSerializer.Deserialize<Dictionary<string, string>>(content);
+            bool parseResult = Int32.TryParse( resultDict["Count"], out var actualCount);
 
             // assert
-            Action act = () => response.EnsureSuccessStatusCode(); 
-            act.Should().NotThrow<HttpRequestException>();
-            response.StatusCode.Should().Be(statusCode);
-            
-            int actualCount = dict.Values.First(); //only one item in collection
+            Assert.Equal(statusCode, response.StatusCode);
+            Assert.NotNull(response.Content);
+            resultDict.Count.Should().Be(expectedCount);
+            foreach (var expectedKey in expectedKeys)
+            {
+                resultDict.ContainsKey(expectedKey).Should().BeTrue();
+            }
+            resultDict["Type"].Should().Be(requestType);
+            parseResult.Should().BeTrue(); // see act if this part of the test fails
             actualCount.Should().BeGreaterOrEqualTo(count);
         }
-#endregion
+
 
 
 
