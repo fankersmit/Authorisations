@@ -5,8 +5,8 @@ namespace Requests.Shared.Domain
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum RequestType
     {
-        Account,
-        Organisation,
-        Product
+        Account,            // 0
+        Organisation,       // 1
+        Product             // 2
     }
 }

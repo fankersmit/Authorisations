@@ -8,6 +8,23 @@ namespace Tests.Authorisations
 {
     public class QueryBuilderTests
     {
+        [Theory]
+        [InlineData("All")]
+        [InlineData("Account")]
+        [InlineData("Organisation")]
+        [InlineData("Product")]
+        public void CanBuild_UnderConsideration_Query(string queryType)
+        {
+            // arrange
+             var builder = new QueryBuilder();
+            // act
+            var query = builder.BuildQueryFor(Queries.UnderConsideration, queryType);
+            // assert
+            query.QueryType.Should().Be(Queries.UnderConsideration);
+            query.Arguments.Count.Should().Be(1);
+            query.Arguments["Type"].Should().Be(queryType);
+        }
+
         [Fact]
         public void CanBuild_CurrentStatus_Query()
         {

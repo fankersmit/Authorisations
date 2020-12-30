@@ -127,6 +127,5 @@ namespace Authorisations.Controllers
             var upr = toConvert.ToUpper()[0];
             return  $"{upr}{toConvert.Substring(1)}";
         }
-
     }
 }

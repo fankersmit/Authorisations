@@ -12,7 +12,7 @@ namespace Authorisations.Infrastructure
             return newQuery;
         }
 
-        public Query BuildQueryFor(Queries queryType, string additionalInfo)
+        public Query BuildQueryFor(Queries queryType, string additionalInfo )
         {
             Query newQuery;
 
