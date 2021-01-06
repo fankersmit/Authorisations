@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using Authorisations.Infrastructure;
 using FluentAssertions;
 using Xunit;
 using Requests.Shared.Domain;
 using RequestsApp.Domain;
+using RequestsApp.Infrastructure;
 using Tests.Helpers;
 
 namespace Tests.Requests
@@ -17,16 +19,51 @@ namespace Tests.Requests
         public DomainTypesFactory Factory { get; }
         public SqliteInMemoryFixture Fixture { get; }
 
+
         // ctors
         public QueryHandlerTests()
         {
             Factory = DomainTypesFactory.Instance;
             Fixture = new SqliteInMemoryFixture();
+
+
         }
 
         public void Dispose()
         {
             Fixture.Dispose();
+        }
+
+        [Fact]
+        public void Can_Retrieve_Request_LatestDocument()
+        {
+            // arrange
+            var keys = new string[] { "Query", "ID", "Request" }; // keys in response
+            var length = keys.Length;
+            var handler = new QueryHandler(Fixture.Context);
+            var builder = new RequestFromJsonBuilder(null); // no logger
+
+            // act
+            var requestId = Fixture.Context.RequestDocuments.First().ID;
+            var args = new Dictionary<string, string>()
+            {
+                { "ID", requestId.ToString() }
+            };
+            var result = handler.QueryFor(Queries.Request, args);
+            var resultDict = JsonSerializer.Deserialize<Dictionary<string, string>>(result);
+            var jsonDoc  = JsonDocument.Parse( resultDict["Request"] );
+            var request = builder.GetRequest(jsonDoc.RootElement);
+            // assert
+            foreach (var s in keys)
+            {
+                resultDict.Should().ContainKey(s);
+            }
+
+            request.Should().NotBeNull();
+            request.Applicant.Should().NotBeNull();
+            request.Contract.Should().NotBeNull();
+            request.Remarks.Should().NotBeNull();
+            request.Contract.Products.Count.Should().BeGreaterThan(0);
         }
 
         [Fact]

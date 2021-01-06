@@ -1,6 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -26,11 +29,13 @@ namespace RequestsApp.Domain
         };
         
         private readonly RequestDbContext _context;
+        private readonly ResponseBuilder _responseBuilder;
 
         // ctors
         public QueryHandler(RequestDbContext requestContext)
         {
             _context = requestContext;
+            _responseBuilder = new ResponseBuilder();
         }
 
         public void Dispose()
@@ -72,16 +77,9 @@ namespace RequestsApp.Domain
                     
                     // query for current info on request 
                     case Queries.Request:
-                        try
-                        {
-                            Guid requestId = Guid.Parse(args["ID"]);
-                            GetRequestHistory(requestId);
-                        }
-                        catch (Exception e) when ( e is ArgumentException || e is FormatException )
-                        {
-                            queryResult = BuildFailureResponse(query, args["ID"], e);
-                        }
-                        break;   
+                        queryResult = BuildResult( GetLatestRequestInfo, query, args);
+                        break;
+
                     // query for all processing done for request with ID
                     case Queries.History:
                         try
@@ -95,13 +93,63 @@ namespace RequestsApp.Domain
                         }
                         break; 
             }
-
             return queryResult;
+        }
+
+        private byte[] GetLatestRequestInfo(Guid requestID, Dictionary<string, string> args, RequestStatus[] status)
+        {
+            Response response;
+            byte[] jsonResponse;
+
+            try
+            {
+                var selectedDocuments = _context.RequestDocuments
+                    .OrderByDescending(p => p.TimeStamp)
+                    .Where( p => p.ID == requestID)
+                    .ToList();
+                var  selectedDocument =  selectedDocuments.First();
+                response = _responseBuilder.Create(Queries.Request, args);
+
+                //response.Add("Request", selectedDocument.SerializedRequest);
+                var encoded = selectedDocument.SerializedRequest.ToArray<char>();
+                var jsonDoc = JsonDocument.Parse( encoded);
+                var serialized = jsonDoc.RootElement.ToString();
+
+                var stream = new MemoryStream();
+                var options = new JsonWriterOptions
+                {
+                    Indented = false
+                };
+
+                using (var writer = new Utf8JsonWriter(stream, options))
+                {
+                    writer.WriteStartObject();
+                    writer.WriteString("Query", response.QueryType.ToString());
+                    foreach (var (key, value) in response.Arguments)
+                    {
+                        writer.WriteString(key, value);
+                    }
+
+                    writer.WritePropertyName("Request");
+                    jsonDoc.WriteTo(writer);
+                    writer.WriteEndObject();
+                    writer.Flush();
+                }
+                jsonResponse = stream.ToArray();
+
+            }
+            catch (Exception e)
+            {
+                // request not found
+                throw new ArgumentException($"Request with ID: {requestID} not found.");
+            }
+            //return response.AsUTF8Bytes;
+            return jsonResponse;
         }
 
         private byte[] GetRequestsWithStatus(Guid requestId, Dictionary<string, string> args, RequestStatus[] status)
         {
-            var resultsDict = new Dictionary<string, string>();
+            var response = _responseBuilder.Create(Queries.WithStatus, args);
 
             var selectedDocuments = _context.RequestDocuments
                 .AsEnumerable()
@@ -113,14 +161,12 @@ namespace RequestsApp.Domain
                     })
                 .ToList();
 
-            var responseDict = resultsDict.Concat(args).ToDictionary(p => p.Key, p => p.Value);
             var count = 1;
             foreach (var item in selectedDocuments)
             {
-                responseDict.Add( $"{count++:D3}", $"ID: {item.ID} version: {item.Version}" );
+                response.Add( $"{count++:D3}", $"ID: {item.ID} version: {item.Version}" );
             }
-
-            return JsonSerializer.SerializeToUtf8Bytes(responseDict);
+            return response.AsUTF8Bytes;
         }
 
         // private helper methods
@@ -138,9 +184,10 @@ namespace RequestsApp.Domain
                 }
                 if (args.ContainsKey("Status"))
                 {
-                    Enum.TryParse<RequestStatus>(args["Status"], out status);
+                    Enum.TryParse(args["Status"], out status);
                 }
 
+                // here  the delegate is invoked
                 queryResult = runner( requestId, args, status );
             }
             catch (Exception e) when ( e is ArgumentException || e is FormatException )
@@ -150,17 +197,6 @@ namespace RequestsApp.Domain
             return queryResult;
         }
 
-        private byte[] BuildHasStatusResponse(bool hasStatus, Dictionary<string, string> args)
-        {
-            var resultsDict = new Dictionary<string, string>
-            {
-                { "Query", "HasStatus" },
-            };
-            var responseDict = resultsDict.Concat(args).ToDictionary(p => p.Key, p => p.Value);
-            responseDict.Add("Result", hasStatus ? "true" : "false");
-            return JsonSerializer.SerializeToUtf8Bytes(responseDict);
-        }
-
         private byte[] HasRequestStatus(  Guid requestID, Dictionary<string,string> args, params RequestStatus[] status  )
         {
             IList<RequestDocument>  selectedDocuments = GetRequestHistory(requestID);
@@ -168,52 +204,31 @@ namespace RequestsApp.Domain
             var builder = new RequestFromJsonBuilder(null); // no logger
             var currentStatus = builder.GetRequest(json.RootElement).Status;
             bool hasStatus = (currentStatus == status[0]);
-            return BuildHasStatusResponse(hasStatus, args );
-        }
-
-        private byte[] BuildUnderConsiderationResponse(string requestType, int count)
-        {
-            var resultsDict = new Dictionary<string, string>
-            {
-                { "Query", "UnderConsideration" },
-                { "Type", requestType },
-                { "Count", count.ToString()}
-            };
-            return JsonSerializer.SerializeToUtf8Bytes(resultsDict);
+            var responseDict = args;
+            responseDict.Add("Result", hasStatus ? "true" : "false");
+            var response = _responseBuilder.Create(Queries.HasStatus, responseDict);
+            return response.AsUTF8Bytes;
         }
 
         private byte[] BuildPingResult()
         {
-            var resultsDict = new Dictionary<string, string>
+            var response = _responseBuilder.Create(Queries.Ping, new Dictionary<string, string>()
             {
-                { "Query", "Ping" },
                 { "Store" , "Up" },
                 { "RequestHandler", "Up"},
                 { "Broker", "Up"}
-            };
-            return JsonSerializer.SerializeToUtf8Bytes(resultsDict);
-        }
-
-        private byte[] BuildCurrentStatusResponse( RequestStatus current, string requestID)
-        {
-            var resultsDict = new Dictionary<string, string>
-            {
-                { "Query", "CurrentStatus" },
-                { "ID", requestID},
-                { "Status", current.ToString("g")}
-            };
-            return JsonSerializer.SerializeToUtf8Bytes(resultsDict);
+            });
+            return response.AsUTF8Bytes;
         }
 
         private byte[] BuildFailureResponse( Queries query, string requestID, Exception exception )
         {
-            var resultsDict = new Dictionary<string, string>
+            var response = _responseBuilder.Create(query, new Dictionary<string, string>
             {
-                {"Query", query.ToString()},
                 {"ID", requestID},
                 {"Failure",  $"{exception.Message}"}
-            };
-            return JsonSerializer.SerializeToUtf8Bytes(resultsDict);
+            });
+            return response.AsUTF8Bytes;
         }
 
         private byte[] GetCurrentStatusForRequest( Guid requestID, Dictionary<string,string> args, params RequestStatus[] status  )
@@ -223,15 +238,24 @@ namespace RequestsApp.Domain
             var json = JsonDocument.Parse(selectedDocuments.Last().SerializedRequest);
             var builder = new RequestFromJsonBuilder(null);
             var request = builder.GetRequest(json.RootElement);
-            return  BuildCurrentStatusResponse(request.Status, requestID.ToString());
-        } 
+            var resultsDict = new Dictionary<string, string>() {
+                { "ID", requestID.ToString() },
+                { "Status", request.Status.ToString("g")}
+            };
+            var response = _responseBuilder.Create(Queries.CurrentStatus, resultsDict);
+            return response.AsUTF8Bytes;
+        }
 
         // TODO: implement querying for  organisation and product requests
         // argument is ignored for now, we return all
-        private byte[] GetRequestsUnderConsideration( Guid requestID, Dictionary<string,string> args, params RequestStatus[] status  )
+        private byte[] GetRequestsUnderConsideration(Guid requestID, Dictionary<string, string> args,
+            params RequestStatus[] status)
         {
             int count = _context.RequestDocuments.Count(p => _commandsIncluded.Contains(p.Command));
-            return BuildUnderConsiderationResponse(args["Type"], count);
+            var response = _responseBuilder.Create(Queries.UnderConsideration);
+            response.Add("Type", args["Type"]);
+            response.Add("Count", count.ToString());
+            return response.AsUTF8Bytes;
         }
 
         private IList<RequestDocument> GetRequestHistory(Guid requestID)

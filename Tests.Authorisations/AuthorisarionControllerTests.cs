@@ -31,19 +31,13 @@ namespace Tests.Authorisations
             _factory = factory;
             _client = _factory.CreateClient();
             _requestModelsFactory = ModelTypesFactory.Instance;
-            // start requestApp if needed
-            _fixture = fixture;
+            _fixture = fixture; // requestapp
         }
 
         //dtors
         ~AuthorisationsControllerTests()
         {
-            _factory.Dispose();
-            _fixture.Dispose();
-        }
-
-        public void Dispose()
-        {
+            _client.Dispose();
             _factory.Dispose();
             _fixture.Dispose();
         }
@@ -52,7 +46,7 @@ namespace Tests.Authorisations
         public async Task Can_Ping_ApiStatus()
         {
             // arrange
-            var expectedKeys = new  string[] {"Query" , "Webserver" , "Broker" , "RequestHandler" , "Store" };
+            var expectedKeys = new [] {"Query" , "Webserver" , "Broker" , "RequestHandler" , "Store" };
 
             // act
             var response = await _client.GetAsync($"{_root}/ping");
@@ -88,7 +82,7 @@ namespace Tests.Authorisations
         public async Task Query_Returns_NotFound_For_NonExisting_ID(string requestId)
         {
             // arrange
-            var expectedKeys = new  string[] {"Query" , "ID" , "Failure" };
+            var expectedKeys = new [] {"Query" , "ID" , "Failure" };
             var expectedCount = expectedKeys.Length;
             var expected = HttpStatusCode.NotFound;
 
@@ -115,7 +109,7 @@ namespace Tests.Authorisations
         {
             // arrange
             var expected = HttpStatusCode.BadRequest;
-            var expectedKeys = new  string[] {"Query" , "ID" , "Failure" };
+            var expectedKeys = new [] {"Query" , "ID" , "Failure" };
             var expectedCount = expectedKeys.Length;
 
             // act

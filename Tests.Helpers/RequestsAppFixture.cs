@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using Tests.Helpers;
 
 namespace Tests.Helpers
 {

@@ -9,11 +9,8 @@ namespace Requests.Shared.Domain
     {
         public static byte[] SerializeToJson<TRequest>(this TRequest model, bool writeIndented = false)
         {
-#if DEBUG
-            var  _writeIndented = true;
-#else
+
             var _writeIndented = writeIndented;
-#endif            
             var options = new JsonSerializerOptions
             {
                 WriteIndented = _writeIndented

@@ -121,6 +121,39 @@ namespace Authorisations.Controllers
             return Ok(responseObject); // 200
         }
 
+        [HttpGet]
+        [Route("request/{requestId}")]
+        [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public object GetLatestRequestInfo(string requestId)
+        {
+            // check if it is a Guid
+            if (!Guid.TryParse(requestId, out var guidRequestID))
+            {
+                var response = new Dictionary<string, string>() {
+                    { "Query", "CurrentStatus"},
+                    { "ID", requestId  },
+                    { "Failure", $"the provided request Id: {requestId} is not a valid Guid."}
+                };
+                return BadRequest(response); // 400
+            }
+
+            var query = _queryBuilder.BuildQueryFor(Queries.Request, guidRequestID);
+            // put request on queue
+            byte[] result = _rpcClient.Call(query.AsUTF8Bytes);
+            //var responseObject = JsonSerializer.Deserialize<JsonDocument>(result);
+            var responseObject = JsonDocument.Parse(result);
+
+            if (responseObject.RootElement.TryGetProperty("Failure", out  var failure))
+            {
+                return NotFound(responseObject); // 404
+            }
+
+            _logger.LogInformation($"Status requested for : {requestId}");
+            return Ok(responseObject); // 200
+        }
+
         // private helper mthods
         string ToTitleCase(string toConvert)
         {

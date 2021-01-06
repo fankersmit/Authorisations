@@ -116,7 +116,7 @@ namespace RequestsApp.Infrastructure
                 .Where(s => s.Key != "Query")
                 .ToDictionary(d => d.Key, d => d.Value);
             // Perform the query
-             var responseBytes = _queryHandler.QueryFor(query, args);
+            var responseBytes = _queryHandler.QueryFor(query, args);
 
             channel.BasicPublish(
                 exchange: "",

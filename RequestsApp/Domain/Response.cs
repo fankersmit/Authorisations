@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
 using Requests.Shared.Domain;
@@ -13,6 +14,7 @@ namespace RequestsApp.Domain
 
         // properties
         public Queries QueryType => Enum.Parse<Queries>(_queryEntries["Query"]);
+
         public Dictionary<string, string> Arguments {
             get
             {
@@ -40,6 +42,15 @@ namespace RequestsApp.Domain
         public int Add(string argumentName, string argumentValue)
         {
             _queryEntries.Add(argumentName, argumentValue);
+            return _queryEntries.Count;
+        }
+
+        public int Add(Dictionary<string, string> range )
+        {
+            foreach (var kv in range)
+            {
+                _queryEntries.Add(kv.Key, kv.Value);
+            }
             return _queryEntries.Count;
         }
 

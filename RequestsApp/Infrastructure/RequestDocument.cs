@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Logging.Abstractions;
 using Requests.Domain;
 using Requests.Shared.Domain;
 
@@ -38,8 +39,13 @@ namespace RequestsApp.Infrastructure
         public RequestDocument() {}
 
         // methods
-               
-        
+        public RequestBase GetRequestFromJsonDocument()
+        {
+            var builder = new RequestFromJsonBuilder(null);
+            var jsonDocument = JsonDocument.Parse(SerializedRequest);
+            return builder.GetRequest(jsonDocument.RootElement);
+        }
+
         // private helpers
         private JsonDocument CreateJsonFromRequest(RequestBase request)
         {

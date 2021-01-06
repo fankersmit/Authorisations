@@ -33,7 +33,7 @@ namespace RequestsApp.Infrastructure
 
         public void OnCommandExecuted(object sender, CommandHandledEventArgs eventArgs)
         {
-            // rerieve document from eventArgs 
+            // retrieve document from eventArgs
             var requestDocument = RequestDocumentFactory.Create(eventArgs.Request, eventArgs.CommandHandled);
             var Id = requestDocument.ID;
             var version = requestDocument.Version;

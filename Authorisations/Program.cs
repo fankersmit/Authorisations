@@ -9,14 +9,22 @@ namespace Authorisations
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            try
+            {
+                CreateHostBuilder(args).Build().Run();
+            }
+            catch (InvalidOperationException ioe)
+            {
+                Console.WriteLine(ioe);
+            }
+            Console.WriteLine(" Press [enter] or [^C] to exit.");
+            Console.ReadLine();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>(); 
-                    
                 });
       
     }

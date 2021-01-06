@@ -13,9 +13,7 @@ namespace Authorisations
         public static IApplicationBuilder UseRabbitDefaultClient(this IApplicationBuilder app)
         {
             DefaultClient = app.ApplicationServices.GetService<RabbitMqDefaultClient>();
-
             var lifetime = app.ApplicationServices.GetService<IHostApplicationLifetime>();
-
             lifetime.ApplicationStarted.Register(OnDefaultStarted);
 
             //press Ctrl+C to reproduce if your app runs in Kestrel as a console app
@@ -30,9 +28,7 @@ namespace Authorisations
         public static IApplicationBuilder UseRabbitRpcClient(this IApplicationBuilder app)
         {
             RpcClient = app.ApplicationServices.GetService<RabbitMqRpcClient>();
-
             var lifetime = app.ApplicationServices.GetService<IHostApplicationLifetime>();
-
             lifetime.ApplicationStarted.Register(OnRpcStarted);
 
             //press Ctrl+C to reproduce if your app runs in Kestrel as a console app
