@@ -99,8 +99,6 @@ namespace RequestsApp.Domain
         private byte[] GetLatestRequestInfo(Guid requestID, Dictionary<string, string> args, RequestStatus[] status)
         {
             Response response;
-            byte[] jsonResponse;
-
             try
             {
                 var selectedDocuments = _context.RequestDocuments
@@ -108,43 +106,15 @@ namespace RequestsApp.Domain
                     .Where( p => p.ID == requestID)
                     .ToList();
                 var  selectedDocument =  selectedDocuments.First();
-                response = _responseBuilder.Create(Queries.Request, args);
 
-                //response.Add("Request", selectedDocument.SerializedRequest);
-                var encoded = selectedDocument.SerializedRequest.ToArray<char>();
-                var jsonDoc = JsonDocument.Parse( encoded);
-                var serialized = jsonDoc.RootElement.ToString();
-
-                var stream = new MemoryStream();
-                var options = new JsonWriterOptions
-                {
-                    Indented = false
-                };
-
-                using (var writer = new Utf8JsonWriter(stream, options))
-                {
-                    writer.WriteStartObject();
-                    writer.WriteString("Query", response.QueryType.ToString());
-                    foreach (var (key, value) in response.Arguments)
-                    {
-                        writer.WriteString(key, value);
-                    }
-
-                    writer.WritePropertyName("Request");
-                    jsonDoc.WriteTo(writer);
-                    writer.WriteEndObject();
-                    writer.Flush();
-                }
-                jsonResponse = stream.ToArray();
-
+                response = _responseBuilder.Create(Queries.Request, args, selectedDocument.SerializedRequest);
             }
             catch (Exception e)
             {
                 // request not found
                 throw new ArgumentException($"Request with ID: {requestID} not found.");
             }
-            //return response.AsUTF8Bytes;
-            return jsonResponse;
+            return response.AsUTF8Bytes;
         }
 
         private byte[] GetRequestsWithStatus(Guid requestId, Dictionary<string, string> args, RequestStatus[] status)

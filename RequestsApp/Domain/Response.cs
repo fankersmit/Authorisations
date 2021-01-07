@@ -25,7 +25,7 @@ namespace RequestsApp.Domain
             }
         }
 
-        public byte[] AsUTF8Bytes => JsonSerializer.SerializeToUtf8Bytes(_queryEntries);
+        public virtual byte[] AsUTF8Bytes => JsonSerializer.SerializeToUtf8Bytes(_queryEntries);
 
         // ctors
         private Response()

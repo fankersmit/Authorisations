@@ -31,7 +31,7 @@ term| definition or values
 |<span style="color:green">Yes</span>|REST|Q|root/requests/under-consideration/{type}/count |GET| 200 |404 | return total number of account requests of {type }being processed
 |<span style="color:green">Yes</span>|REST|Q|root/requests/{status} |GET| 200|404| returns ID of all requests with status = {status}
 |<span style="color:red">No</span>|REST|Q|root/requests/{status}/{type} |GET| 200|404| returns ID of all requests of {type} with status = {status}}
-|<span style="color:red">No</span>|REST|Q|root/request/{id}|GET| 200|404| returns current request info wher  ID = {id}
+|<span style="color:green">Yes</span>|REST|Q|root/request/{id}|GET| 200|404| returns current request info where ID = {id}
 |<span style="color:red">No</span>|REST|C|root/request/submit/{type}|POST| 202|404,405| submit request where type is in {account, product, organisation}
 |<span style="color:red">No</span>|REST|C|root/request/{id}/confirm|POST| 202|404,405| confirm request where id = {id} 
 |<span style="color:red">No</span>|REST|C|root/request/{id}/cancel|POST| 202|404,405| cancel request where id = {id} 
