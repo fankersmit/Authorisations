@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Requests.Shared.Domain;
 
 namespace Authorisations.Infrastructure
@@ -12,7 +13,17 @@ namespace Authorisations.Infrastructure
             return newQuery;
         }
 
-        public Query BuildQueryFor(Queries queryType, string additionalInfo )
+        public Query BuildQueryFor(Queries queryType, Dictionary<string, string> args )
+        {
+            var newQuery = new Query(queryType);
+            foreach (var (keyName, valueName) in args)
+            {
+                newQuery.Add(keyName, valueName );
+            }
+            return newQuery;
+        }
+
+        public Query BuildQueryFor(Queries queryType, string additionalInfo = "None" )
         {
             Query newQuery;
 
@@ -24,15 +35,25 @@ namespace Authorisations.Infrastructure
                     break;
 
                 case Queries.Ping:
+                    // additional info ignored
                     newQuery = new Query(Queries.Ping);
+                    break;
+
+                case Queries.WithStatus:
+                    newQuery = new Query(Queries.WithStatus);
+                    newQuery.Add("Status", additionalInfo);
+                    break;
+
+                case Queries.HasStatus:
+                    newQuery = new Query(Queries.HasStatus);
+                    newQuery.Add("Status", additionalInfo);
                     break;
 
                 case Queries.History:
                 case Queries.Invalid:
                 case Queries.Request:
                 case Queries.CurrentStatus:
-                case Queries.HasStatus:
-                case Queries.WithStatus:
+
                 default:
                 throw new NotImplementedException();
             }

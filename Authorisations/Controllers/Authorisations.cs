@@ -78,6 +78,28 @@ namespace Authorisations.Controllers
         }
 
         [HttpGet]
+        [Route("requests/{withStatus}")]
+        [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status400BadRequest)]
+        public object RequestsWithStus(string withStatus)
+        {
+            if( !Enum.TryParse<RequestStatus>(ToTitleCase(withStatus), out var withRequestStatus) )
+            {
+                var response = new Dictionary<string, string>() {
+                    { "Query", "WithStatus"},
+                    { "Failure", "The provided url or status is not valid."}
+                };
+                return BadRequest(response); // 400
+            }
+
+            var query = _queryBuilder.BuildQueryFor(Queries.WithStatus, withRequestStatus.ToString() );
+            var result = _rpcClient.Call(query.AsUTF8Bytes);
+            var responseObject = JsonSerializer.Deserialize<Dictionary<string, string>>(result);
+            _logger.LogInformation( $"Query {withStatus} executed at: {DateTime.UtcNow}");
+            return Ok(responseObject);
+        }
+
+        [HttpGet]
         [Route("ping")]
         [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
         public object Ping()
@@ -89,6 +111,7 @@ namespace Authorisations.Controllers
             _logger.LogInformation( $"Status pinged at: {DateTime.UtcNow}");
             return Ok(responseObject); //200
         }
+
 
         [HttpGet]
         [Route("request/{requestId}/status")]
@@ -120,6 +143,7 @@ namespace Authorisations.Controllers
             _logger.LogInformation($"Status requested for : {requestId}");
             return Ok(responseObject); // 200
         }
+
 
         [HttpGet]
         [Route("request/{requestId}")]
@@ -154,7 +178,60 @@ namespace Authorisations.Controllers
             return Ok(responseObject); // 200
         }
 
-        // private helper mthods
+        [HttpGet]
+        [Route("request/{requestId}/status/{requestStatus}")]
+        [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public object GetStatusForRequest(string requestId, string requestStatus)
+        {
+            var failures = new List<string>();
+
+            // check if it is a Guid
+            if (!Guid.TryParse(requestId, out var guidRequestID))
+            {
+                failures.Add($"the provided request Id: {requestId} is not a valid Guid.");
+            }
+
+            if (!Enum.TryParse<RequestStatus>(ToTitleCase(requestStatus), out var requestStatusEnum) )
+            {
+                failures.Add($"the provided status Id: {requestStatus} is not a valid status.");
+            }
+
+            if( failures.Count > 0 )
+            {
+                var response = new Dictionary<string, string>()
+                {
+                    {"Query", "HasStatus"},
+                    {"ID", requestId}
+                };
+                foreach (var failure in failures)
+                {
+                    response.Add("Failure", failure);
+                }
+                return BadRequest(response); // 400
+            }
+
+            var args = new Dictionary<string, string>()
+            {
+                {"ID", requestId },
+                {"Status", requestStatus}
+            };
+
+            var query = _queryBuilder.BuildQueryFor(Queries.HasStatus, args);
+            // put request on queue
+            var result = _rpcClient.Call(query.AsUTF8Bytes);
+            var responseObject = JsonSerializer.Deserialize<Dictionary<string, string>>(result);
+            if (responseObject.ContainsKey("Failure"))
+            {
+                return NotFound(responseObject); // 404
+            }
+
+            _logger.LogInformation($"Status requested for : {requestId}");
+            return Ok(responseObject); // 200
+        }
+
+        // private helper methods
         string ToTitleCase(string toConvert)
         {
             var upr = toConvert.ToUpper()[0];

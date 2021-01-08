@@ -117,13 +117,13 @@ namespace RequestsApp.Domain
             return response.AsUTF8Bytes;
         }
 
-        private byte[] GetRequestsWithStatus(Guid requestId, Dictionary<string, string> args, RequestStatus[] status)
+        private byte[] GetRequestsWithStatus(Guid requestID, Dictionary<string, string> args, RequestStatus[] status)
         {
             var response = _responseBuilder.Create(Queries.WithStatus, args);
 
             var selectedDocuments = _context.RequestDocuments
                 .AsEnumerable()
-                .Where( p => p.Request.Status == status[0])
+                .Where( p => p.SerializedRequest.Contains( status[0].ToString()))
                 .Select(p => new
                     {
                         p.ID,
